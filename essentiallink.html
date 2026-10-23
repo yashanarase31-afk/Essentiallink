@@ -1,0 +1,1481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EssentialLink | Your Extra. Someone's Essential.</title>
+  
+  <style>
+    :root {
+      --primary: #0e6b56;
+      --primary-hover: #0a5242;
+      --primary-light: #e8f5f1;
+      --dark: #0f2c25;
+      --accent: #f59e0b;
+      --accent-hover: #d97706;
+      --accent-light: #fef3c7;
+      --bg: #f6faf8;
+      --surface: #ffffff;
+      --border: #d4e5de;
+      --text: #1f2937;
+      --text-muted: #64748b;
+      --danger: #ef4444;
+      --danger-light: #fee2e2;
+      --success: #10b981;
+      --success-light: #d1fae5;
+      --info: #3b82f6;
+      --info-light: #dbeafe;
+      --shadow-sm: 0 2px 8px rgba(15, 44, 37, 0.06);
+      --shadow: 0 10px 25px -5px rgba(15, 44, 37, 0.08), 0 8px 10px -6px rgba(15, 44, 37, 0.04);
+      --radius: 12px;
+      --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    /* Header & Navigation */
+    header {
+      background: var(--dark);
+      color: white;
+      padding: 16px 6%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    }
+
+    .logo {
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+    }
+
+    .logo span {
+      color: var(--accent);
+    }
+
+    nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    button {
+      border: none;
+      border-radius: 8px;
+      padding: 10px 16px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: var(--transition);
+    }
+
+    nav button {
+      background: rgba(255, 255, 255, 0.12);
+      color: white;
+      backdrop-filter: blur(8px);
+    }
+
+    nav button:hover {
+      background: rgba(255, 255, 255, 0.22);
+      transform: translateY(-1px);
+    }
+
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-accent { background: var(--accent); color: #2e1a02; }
+    .btn-accent:hover { background: var(--accent-hover); color: white; }
+    .btn-info { background: var(--info); color: white; }
+    .btn-info:hover { opacity: 0.9; }
+    .btn-danger { background: var(--danger); color: white; }
+    .btn-danger:hover { opacity: 0.9; }
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+    .btn-outline:hover {
+      background: #f1f5f9;
+    }
+
+    /* Hero Section */
+    .hero {
+      padding: 80px 8%;
+      text-align: center;
+      color: white;
+      background: linear-gradient(135deg, rgba(14, 107, 86, 0.92) 0%, rgba(15, 44, 37, 0.96) 100%),
+        url("https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=1600&q=80") center/cover no-repeat;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .hero h1 {
+      font-size: clamp(32px, 5vw, 56px);
+      font-weight: 800;
+      line-height: 1.15;
+      margin-bottom: 16px;
+      max-width: 800px;
+    }
+
+    .hero p {
+      font-size: clamp(16px, 2vw, 20px);
+      color: rgba(255,255,255,0.9);
+      margin-bottom: 28px;
+      max-width: 600px;
+    }
+
+    .hero .hero-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    /* Main Container */
+    main {
+      width: 90%;
+      max-width: 1300px;
+      margin: 40px auto;
+    }
+
+    section {
+      margin-bottom: 48px;
+      scroll-margin-top: 90px;
+    }
+
+    .section-title {
+      display: flex;
+      justify-content: space-between;
+      gap: 15px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    .section-title h2 {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--dark);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Stats Grid */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 36px;
+    }
+
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      transition: var(--transition);
+    }
+
+    .stat-card:hover {
+      box-shadow: var(--shadow);
+      transform: translateY(-2px);
+    }
+
+    .stat-card small {
+      color: var(--text-muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 12px;
+      letter-spacing: 0.5px;
+    }
+
+    .stat-card strong {
+      font-size: 34px;
+      font-weight: 800;
+      color: var(--primary);
+    }
+
+    /* Panels & Cards */
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 18px;
+    }
+
+    .request-card, .order-card, .rider-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px;
+      box-shadow: var(--shadow-sm);
+      transition: var(--transition);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .request-card:hover {
+      border-color: var(--primary);
+      box-shadow: var(--shadow);
+      transform: translateY(-3px);
+    }
+
+    .top-line {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+
+    .top-line h3 {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--dark);
+    }
+
+    .top-line small {
+      color: var(--text-muted);
+      font-size: 12px;
+    }
+
+    /* Badges */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      background: var(--primary-light);
+      color: var(--primary);
+      white-space: nowrap;
+    }
+
+    .badge-yellow { background: var(--accent-light); color: #92400e; }
+    .badge-red { background: var(--danger-light); color: var(--danger); }
+    .badge-blue { background: var(--info-light); color: var(--info); }
+    .badge-green { background: var(--success-light); color: var(--success); }
+
+    /* Forms */
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+
+    .full {
+      grid-column: 1 / -1;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    label {
+      font-weight: 600;
+      font-size: 13px;
+      color: var(--dark);
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      outline: none;
+      background: white;
+      font-size: 14px;
+      color: var(--text);
+      transition: var(--transition);
+    }
+
+    textarea {
+      min-height: 90px;
+      resize: vertical;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(14, 107, 86, 0.15);
+    }
+
+    .notice {
+      padding: 12px 16px;
+      background: #fffbeb;
+      border-left: 4px solid var(--accent);
+      border-radius: 6px;
+      font-size: 14px;
+      color: #92400e;
+      margin-bottom: 20px;
+    }
+
+    .progress-bar {
+      height: 8px;
+      background: #e2e8f0;
+      border-radius: 999px;
+      overflow: hidden;
+      margin: 14px 0;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--primary);
+      transition: width 0.4s ease;
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+
+    .card-actions button {
+      padding: 7px 12px;
+      font-size: 12px;
+    }
+
+    /* Modals */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 16px;
+      background: rgba(15, 44, 37, 0.65);
+      backdrop-filter: blur(4px);
+      opacity: 1;
+      visibility: visible;
+      transition: var(--transition);
+    }
+
+    .modal-backdrop.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .modal-box {
+      width: 100%;
+      max-width: 600px;
+      max-height: 90vh;
+      overflow-y: auto;
+      background: white;
+      border-radius: 16px;
+      padding: 28px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      transform: translateY(0);
+      transition: var(--transition);
+      position: relative;
+    }
+
+    .modal-backdrop.hidden .modal-box {
+      transform: translateY(20px);
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #f1f5f9;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      color: var(--text-muted);
+      transition: var(--transition);
+    }
+
+    .modal-close:hover {
+      background: #e2e8f0;
+      color: var(--dark);
+    }
+
+    /* Toast Notification */
+    #toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 120;
+      background: var(--dark);
+      color: white;
+      padding: 14px 20px;
+      border-radius: 10px;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+      font-size: 14px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: var(--transition);
+      pointer-events: none;
+      max-width: 400px;
+    }
+
+    #toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    /* Footer */
+    footer {
+      background: var(--dark);
+      color: white;
+      padding: 60px 8% 30px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 32px;
+    }
+
+    footer h3 {
+      color: var(--accent);
+      font-size: 16px;
+      margin-bottom: 14px;
+      font-weight: 700;
+    }
+
+    footer p, footer a {
+      color: #cbd5e1;
+      font-size: 14px;
+      line-height: 1.8;
+      text-decoration: none;
+      transition: var(--transition);
+    }
+
+    footer a:hover {
+      color: white;
+    }
+
+    .copyright {
+      grid-column: 1 / -1;
+      border-top: 1px solid rgba(255,255,255,0.12);
+      text-align: center;
+      padding-top: 24px;
+      color: #94a3b8;
+      font-size: 13px;
+    }
+
+    .empty-state {
+      padding: 32px;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 15px;
+      background: #f8fafc;
+      border-radius: var(--radius);
+      border: 1px dashed var(--border);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      header {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      nav {
+        justify-content: space-between;
+      }
+      nav button {
+        flex: 1 1 45%;
+      }
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+      .full {
+        grid-column: auto;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Sticky Header -->
+  <header>
+    <div class="logo" onclick="goTo('hero')">
+      🌱 Essential<span>Link</span>
+    </div>
+
+    <nav>
+      <button onclick="goTo('receiver')">Request Supplies</button>
+      <button onclick="goTo('donorFeed')">Donate</button>
+      <button onclick="goTo('riders')">Riders</button>
+      <button onclick="goTo('tracking')">Track Orders</button>
+      <button onclick="goTo('admin')">Admin</button>
+    </nav>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero" id="hero">
+    <h1>Your extra. Someone's Essential.</h1>
+    <p>Connecting people facing shortages with generous donors and rapid volunteer delivery partners.</p>
+    <div class="hero-actions">
+      <button class="btn-accent" onclick="goTo('receiver')">Place a Request</button>
+      <button class="btn-primary" onclick="goTo('donorFeed')">Explore Requests to Donate</button>
+    </div>
+  </section>
+
+  <!-- Main Content -->
+  <main>
+
+    <!-- Real-time Stats Dashboard -->
+    <section class="stats">
+      <div class="stat-card">
+        <small>Total Requests</small>
+        <strong id="totalRequests">0</strong>
+      </div>
+      <div class="stat-card">
+        <small>Donations Fulfilled</small>
+        <strong id="donatedRequests">0</strong>
+      </div>
+      <div class="stat-card">
+        <small>Active Deliveries</small>
+        <strong id="activeDeliveries">0</strong>
+      </div>
+      <div class="stat-card">
+        <small>Available Riders</small>
+        <strong id="availableRiders">0</strong>
+      </div>
+    </section>
+
+    <!-- SECTION 1: RECEIVER REQUEST FORM -->
+    <section id="receiver">
+      <div class="section-title">
+        <h2>📦 Receiver: Request Food or Essential Supplies</h2>
+      </div>
+
+      <div class="panel">
+        <div class="notice">
+          ℹ️ Once submitted, your request will be reviewed and made visible in the community feed for generous donors to fulfill.
+        </div>
+
+        <form id="receiverForm" onsubmit="handleReceiverSubmit(event)">
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="receiverName">Receiver or Organization Name *</label>
+              <input id="receiverName" required placeholder="e.g. Hope Orphanage / John Doe">
+            </div>
+
+            <div class="form-group">
+              <label for="receiverMobile">Mobile Number *</label>
+              <input id="receiverMobile" type="tel" required placeholder="+91 98765 43210">
+            </div>
+
+            <div class="form-group">
+              <label for="reason">Reason for Request</label>
+              <select id="reason">
+                <option>Food shortage</option>
+                <option>Medical emergency</option>
+                <option>Night shelter support</option>
+                <option>Disaster / Flood relief</option>
+                <option>Family emergency</option>
+                <option>Elderly assistance</option>
+                <option>Other</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="category">Category</label>
+              <select id="category">
+                <option>Food & Nutrition</option>
+                <option>Medical Supplies</option>
+                <option>Hygiene & Sanitation</option>
+                <option>Blankets & Warm Clothing</option>
+                <option>Baby Care</option>
+                <option>Other</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="item">Required Item</label>
+              <select id="item">
+                <option>Cooked meals</option>
+                <option>Packaged food / Groceries</option>
+                <option>Rice & Grains</option>
+                <option>Drinking Water bottles</option>
+                <option>First-aid & bandages</option>
+                <option>Essential Medicines</option>
+                <option>Hygiene kits</option>
+                <option>Blankets / Sheets</option>
+                <option>Diapers & Baby milk</option>
+                <option>Other emergency kit</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="quantity">Quantity Required *</label>
+              <input id="quantity" type="number" min="1" value="10" required>
+            </div>
+
+            <div class="form-group full">
+              <label for="address">Delivery Street Address *</label>
+              <input id="address" required placeholder="Apartment / Building / Landmark / Street">
+            </div>
+
+            <div class="form-group">
+              <label for="location">City / Area</label>
+              <input id="location" placeholder="e.g. Sector 14, Delhi">
+            </div>
+
+            <div class="form-group">
+              <label for="deliveryTime">Preferred Delivery Time</label>
+              <input id="deliveryTime" type="datetime-local">
+            </div>
+
+            <div class="form-group full">
+              <label for="requestNotes">Special Instructions or Additional Details</label>
+              <textarea id="requestNotes" placeholder="Explain details such as dietary needs, accessibility guidelines, or urgency..."></textarea>
+            </div>
+          </div>
+
+          <div style="margin-top: 20px;">
+            <button type="submit" class="btn-primary">
+              Submit Receiver Request
+            </button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- SECTION 2: DONOR FEED -->
+    <section id="donorFeed">
+      <div class="section-title">
+        <h2>🤲 Requests Waiting for Donors</h2>
+        <button class="btn-outline" onclick="renderRequests()">↻ Refresh Feed</button>
+      </div>
+
+      <div class="notice">
+        Click any request card to see receiver details, location, and choose to <b>Accept & Donate</b>.
+      </div>
+
+      <div id="requestFeed" class="grid"></div>
+    </section>
+
+    <!-- SECTION 3: RIDERS & DELIVERY PARTNERS -->
+    <section id="riders">
+      <div class="section-title">
+        <h2>🚴 Delivery Partners & Volunteers</h2>
+        <button class="btn-primary" onclick="toggleRiderForm()">+ Register as Rider</button>
+      </div>
+
+      <div class="panel hidden" id="riderFormPanel" style="margin-bottom: 24px;">
+        <h3 style="margin-bottom: 16px;">Rider Registration</h3>
+        <form onsubmit="handleRiderSubmit(event)">
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="riderName">Full Name *</label>
+              <input id="riderName" required placeholder="John Volunteer">
+            </div>
+
+            <div class="form-group">
+              <label for="riderMobile">Mobile Number *</label>
+              <input id="riderMobile" type="tel" required placeholder="+91 98765 00000">
+            </div>
+
+            <div class="form-group">
+              <label for="vehicle">Vehicle Type</label>
+              <select id="vehicle">
+                <option>Motorcycle / Scooter</option>
+                <option>Bicycle</option>
+                <option>Car</option>
+                <option>Van / Utility Vehicle</option>
+                <option>Truck</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="capacity">Delivery Capacity (Parallel Orders)</label>
+              <input id="capacity" type="number" min="1" max="20" value="4" required>
+            </div>
+
+            <div class="form-group full">
+              <label for="riderLocation">Current Hub / Operating Area</label>
+              <input id="riderLocation" placeholder="e.g. Downtown Central / West Zone">
+            </div>
+          </div>
+
+          <div style="margin-top: 18px; display: flex; gap: 10px;">
+            <button type="submit" class="btn-primary">Complete Rider Sign-up</button>
+            <button type="button" class="btn-outline" onclick="toggleRiderForm()">Cancel</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="grid" id="riderList"></div>
+    </section>
+
+    <!-- SECTION 4: LIVE ORDER TRACKING -->
+    <section id="tracking">
+      <div class="section-title">
+        <h2>📍 Live Orders & Delivery Tracking</h2>
+      </div>
+
+      <div class="panel">
+        <div id="orderList">
+          <div class="empty-state">No active donations yet. When a donor accepts a request, tracking will start here.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 5: ADMINISTRATOR PANEL -->
+    <section id="admin">
+      <div class="section-title">
+        <h2>🛡️ Administrator Review Portal</h2>
+      </div>
+
+      <div class="panel">
+        <div id="adminLogin">
+          <p style="margin-bottom: 12px; color: var(--text-muted);">
+            Administrator authentication is required to review, verify, or dismiss incoming requests.
+          </p>
+
+          <form onsubmit="loginAdmin(event)" style="max-width: 380px;">
+            <div class="form-group">
+              <label for="adminPassword">Admin Password (Default: <code>admin123</code>)</label>
+              <input id="adminPassword" type="password" required placeholder="Enter password">
+            </div>
+            <button type="submit" class="btn-primary" style="margin-top: 14px;">Log In to Admin</button>
+          </form>
+        </div>
+
+        <div id="adminContent" class="hidden">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <div class="badge badge-green">✓ Administrator Access Granted</div>
+            <button class="btn-danger" style="padding: 6px 12px; font-size: 13px;" onclick="logoutAdmin()">Logout</button>
+          </div>
+
+          <h3 style="margin-bottom: 14px;">All Managed Requests</h3>
+          <div id="adminRequests" style="display: flex; flex-direction: column; gap: 14px;"></div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <div>
+      <h3>EssentialLink</h3>
+      <p>Bridging food security, medical needs, and surplus supplies with transparent relief delivery.</p>
+      <p style="margin-top: 10px;">Zero-waste. High-impact. Community-driven.</p>
+    </div>
+
+    <div>
+      <h3>Quick Links</h3>
+      <p><a href="#receiver">Request Supplies</a></p>
+      <p><a href="#donorFeed">Donate to Request</a></p>
+      <p><a href="#tracking">Track Deliveries</a></p>
+      <p><a href="#riders">Join as a Volunteer Rider</a></p>
+    </div>
+
+    <div>
+      <h3>Support & Contact</h3>
+      <p>📞 Emergency Toll-Free: +91 98765 43210</p>
+      <p>🕘 24/7 Rapid Response Network</p>
+      <p><a href="mailto:support.essentiallink@example.org">support.essentiallink@example.org</a></p>
+    </div>
+
+    <div>
+      <h3>How It Works</h3>
+      <p><b>1. Request:</b> Receivers post what they urgently require.</p>
+      <p><b>2. Donate:</b> Donors pledge exact items and quantities.</p>
+      <p><b>3. Deliver:</b> An available local rider is auto-matched for pickup & drop.</p>
+    </div>
+
+    <div class="copyright">
+      © 2026 EssentialLink Platform. All rights reserved. Built with pride for social good.
+    </div>
+  </footer>
+
+  <!-- MODAL: REQUEST DETAILS -->
+  <div class="modal-backdrop hidden" id="requestModal" onclick="handleBackdropClick(event, 'requestModal')">
+    <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <button class="modal-close" onclick="closeModal('requestModal')" aria-label="Close modal">×</button>
+      <h2 id="modalTitle">Receiver Request Details</h2>
+      <div id="requestDetailsBody" style="margin: 18px 0;"></div>
+
+      <div class="card-actions" style="justify-content: flex-end;">
+        <button class="btn-outline" onclick="closeModal('requestModal')">Close</button>
+        <button class="btn-danger" id="rejectButton">Reject Request</button>
+        <button class="btn-primary" id="acceptButton">Accept & Donate</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: DONOR PLEDGE FORM -->
+  <div class="modal-backdrop hidden" id="donorModal" onclick="handleBackdropClick(event, 'donorModal')">
+    <div class="modal-box" role="dialog" aria-modal="true">
+      <button class="modal-close" onclick="closeModal('donorModal')" aria-label="Close modal">×</button>
+      <h2>Fulfill Donation</h2>
+      <div id="donorRequestSummary" style="margin: 14px 0;"></div>
+
+      <form onsubmit="handleDonationConfirm(event)">
+        <div class="form-group" style="margin-bottom: 12px;">
+          <label for="donorName">Your Name / Organization *</label>
+          <input id="donorName" required placeholder="e.g. Good Samaritan Bakery / Sarah">
+        </div>
+
+        <div class="form-group" style="margin-bottom: 12px;">
+          <label for="donorPhone">Contact Number *</label>
+          <input id="donorPhone" type="tel" required placeholder="+91 98765 11111">
+        </div>
+
+        <div class="form-group" style="margin-bottom: 12px;">
+          <label for="pickupAddress">Pickup Address *</label>
+          <input id="pickupAddress" required placeholder="Address where rider should collect items">
+        </div>
+
+        <div class="form-group" style="margin-bottom: 12px;">
+          <label for="expiry">Food / Kit Freshness Expiration</label>
+          <select id="expiry">
+            <option value="40">Cooked food — Expires in 40 minutes</option>
+            <option value="60">Cooked food — Expires in 60 minutes</option>
+            <option value="120">Perishable — Expires in 2 hours</option>
+            <option value="0">Non-perishable (Does not expire)</option>
+          </select>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 18px;">
+          <label for="pickupNotes">Pickup Notes for Rider</label>
+          <textarea id="pickupNotes" placeholder="e.g. Buzz apartment 402, items packaged in paper cartons"></textarea>
+        </div>
+
+        <button type="submit" class="btn-primary" style="width: 100%;">
+          Confirm Donation & Auto-Assign Rider
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast"></div>
+
+  <!-- JavaScript Application Logic -->
+  <script>
+    const ADMIN_PASSWORD = "admin123";
+
+    // Application State from LocalStorage
+    let requests = JSON.parse(localStorage.getItem("essentialRequests") || "[]");
+    let orders = JSON.parse(localStorage.getItem("essentialOrders") || "[]");
+    let riders = JSON.parse(localStorage.getItem("essentialRiders") || "[]");
+
+    let selectedRequestId = null;
+
+    // Helper: Escape HTML to avoid XSS
+    function escapeHTML(str) {
+      if (!str) return "";
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    // Seed default sample riders if none exist
+    if (!riders.length) {
+      riders = [
+        {
+          id: "R-101",
+          name: "Aman Sharma",
+          mobile: "+91 98765 12345",
+          vehicle: "Motorcycle",
+          capacity: 4,
+          assigned: 0,
+          location: "Central Delhi Hub",
+          available: true,
+          stars: 12
+        },
+        {
+          id: "R-102",
+          name: "Pooja Varma",
+          mobile: "+91 98111 22334",
+          vehicle: "Van",
+          capacity: 8,
+          assigned: 0,
+          location: "North Sector Hub",
+          available: true,
+          stars: 20
+        }
+      ];
+      saveState();
+    }
+
+    function saveState() {
+      localStorage.setItem("essentialRequests", JSON.stringify(requests));
+      localStorage.setItem("essentialOrders", JSON.stringify(orders));
+      localStorage.setItem("essentialRiders", JSON.stringify(riders));
+    }
+
+    function goTo(id) {
+      const el = document.getElementById(id);
+      if (el) el.scrollIntoView({ behavior: "smooth" });
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.innerHTML = `<span>🔔</span> <span>${escapeHTML(message)}</span>`;
+      toast.classList.add("show");
+      clearTimeout(toast._timeout);
+      toast._timeout = setTimeout(() => {
+        toast.classList.remove("show");
+      }, 3500);
+    }
+
+    // Modal controls
+    function openModal(id) {
+      document.getElementById(id).classList.remove("hidden");
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.add("hidden");
+    }
+
+    function handleBackdropClick(event, id) {
+      if (event.target === event.currentTarget) {
+        closeModal(id);
+      }
+    }
+
+    // ESC key closes modals
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        document.querySelectorAll(".modal-backdrop").forEach(m => m.classList.add("hidden"));
+      }
+    });
+
+    // 1. Receiver Submission
+    function handleReceiverSubmit(e) {
+      e.preventDefault();
+      const name = document.getElementById("receiverName").value.trim();
+      const mobile = document.getElementById("receiverMobile").value.trim();
+      const quantity = Number(document.getElementById("quantity").value);
+      const address = document.getElementById("address").value.trim();
+
+      if (!name || !mobile || !quantity || !address) {
+        showToast("Please fill out all required fields.");
+        return;
+      }
+
+      const request = {
+        id: "REQ-" + Date.now().toString().slice(-6),
+        receiverName: name,
+        receiverMobile: mobile,
+        reason: document.getElementById("reason").value,
+        category: document.getElementById("category").value,
+        item: document.getElementById("item").value,
+        quantity,
+        address,
+        location: document.getElementById("location").value.trim(),
+        deliveryTime: document.getElementById("deliveryTime").value,
+        notes: document.getElementById("requestNotes").value.trim(),
+        status: "Pending", // Visible to donors & admin
+        createdAt: Date.now()
+      };
+
+      requests.unshift(request);
+      saveState();
+      renderAll();
+
+      document.getElementById("receiverForm").reset();
+      showToast(`Request ${request.id} created and visible to donors!`);
+      goTo("donorFeed");
+    }
+
+    // 2. Render Donor Feed
+    // Note: includes both "Pending" and admin-approved requests so it never gets lost!
+    function renderRequests() {
+      const feed = document.getElementById("requestFeed");
+      const activeRequests = requests.filter(r => 
+        r.status === "Pending" || r.status.includes("Approved")
+      );
+
+      if (!activeRequests.length) {
+        feed.innerHTML = `
+          <div class="empty-state full">
+            ✨ No pending requests waiting for donors right now. Great job community!
+          </div>
+        `;
+        return;
+      }
+
+      feed.innerHTML = activeRequests.map(r => `
+        <div class="request-card">
+          <div>
+            <div class="top-line">
+              <div>
+                <h3>${escapeHTML(r.item)}</h3>
+                <small>${escapeHTML(r.id)} • ${escapeHTML(r.category)}</small>
+              </div>
+              <span class="badge badge-yellow">${escapeHTML(r.status)}</span>
+            </div>
+
+            <div style="font-size: 14px; margin-bottom: 12px; color: var(--text);">
+              <p><strong>Quantity:</strong> ${escapeHTML(r.quantity)} units</p>
+              <p><strong>Reason:</strong> ${escapeHTML(r.reason)}</p>
+              <p><strong>Area:</strong> ${escapeHTML(r.location || r.address)}</p>
+            </div>
+          </div>
+
+          <button class="btn-primary" style="width: 100%;" onclick="openRequestModal('${r.id}')">
+            View Details & Donate
+          </button>
+        </div>
+      `).join("");
+    }
+
+    // 3. Request Details Modal
+    function openRequestModal(id) {
+      selectedRequestId = id;
+      const request = requests.find(r => r.id === id);
+      if (!request) return;
+
+      document.getElementById("requestDetailsBody").innerHTML = `
+        <div class="notice">
+          Please review the request details. Accepting will prompt your pickup details and connect you with a delivery rider.
+        </div>
+        <div style="font-size: 14px; display: flex; flex-direction: column; gap: 8px;">
+          <div><b>Request ID:</b> ${escapeHTML(request.id)}</div>
+          <div><b>Receiver Name:</b> ${escapeHTML(request.receiverName)}</div>
+          <div><b>Contact Mobile:</b> ${escapeHTML(request.receiverMobile)}</div>
+          <div><b>Item Requested:</b> ${escapeHTML(request.item)} (${escapeHTML(request.quantity)} units)</div>
+          <div><b>Category:</b> ${escapeHTML(request.category)}</div>
+          <div><b>Reason:</b> ${escapeHTML(request.reason)}</div>
+          <div><b>Drop Address:</b> ${escapeHTML(request.address)}</div>
+          <div><b>City / Area:</b> ${escapeHTML(request.location || "Not specified")}</div>
+          <div><b>Preferred Delivery Time:</b> ${escapeHTML(request.deliveryTime || "Urgent / ASAP")}</div>
+          <div><b>Notes:</b> ${escapeHTML(request.notes || "None provided")}</div>
+        </div>
+      `;
+
+      document.getElementById("acceptButton").onclick = () => {
+        closeModal("requestModal");
+        openDonorModal(request);
+      };
+
+      document.getElementById("rejectButton").onclick = () => {
+        rejectRequest(request.id);
+        closeModal("requestModal");
+      };
+
+      openModal("requestModal");
+    }
+
+    // 4. Open Donor Form Modal
+    function openDonorModal(request) {
+      document.getElementById("donorRequestSummary").innerHTML = `
+        <div class="notice">
+          You are pledging to supply <b>${escapeHTML(request.quantity)} units</b> of 
+          <b>${escapeHTML(request.item)}</b> for <b>${escapeHTML(request.receiverName)}</b>.
+        </div>
+      `;
+      openModal("donorModal");
+    }
+
+    // 5. Confirm Donation & Auto Assign Rider
+    function handleDonationConfirm(e) {
+      e.preventDefault();
+      const request = requests.find(r => r.id === selectedRequestId);
+      if (!request) {
+        showToast("Request not found.");
+        return;
+      }
+
+      const donorName = document.getElementById("donorName").value.trim();
+      const donorPhone = document.getElementById("donorPhone").value.trim();
+      const pickupAddress = document.getElementById("pickupAddress").value.trim();
+      const expiry = Number(document.getElementById("expiry").value);
+      const pickupNotes = document.getElementById("pickupNotes").value.trim();
+
+      // Find an available rider with spare capacity
+      const rider = riders.find(r => r.available && r.assigned < r.capacity);
+
+      const order = {
+        id: "EL-" + Date.now().toString().slice(-6),
+        requestId: request.id,
+        item: request.item,
+        category: request.category,
+        quantity: request.quantity,
+        receiverName: request.receiverName,
+        receiverMobile: request.receiverMobile,
+        deliveryAddress: request.address,
+        deliveryLocation: request.location,
+        donorName,
+        donorPhone,
+        pickupAddress,
+        pickupNotes,
+        expiry,
+        expiresAt: expiry ? Date.now() + expiry * 60000 : null,
+        riderId: rider ? rider.id : null,
+        riderName: rider ? rider.name : null,
+        riderMobile: rider ? rider.mobile : null,
+        status: rider ? "Rider Assigned" : "Waiting for Rider",
+        progress: rider ? 25 : 10,
+        createdAt: Date.now()
+      };
+
+      if (rider) {
+        rider.assigned++;
+        if (rider.assigned >= rider.capacity) {
+          rider.available = false;
+        }
+      }
+
+      request.status = "Donated";
+      request.donorName = donorName;
+      request.orderId = order.id;
+
+      orders.unshift(order);
+      saveState();
+      renderAll();
+
+      closeModal("donorModal");
+      showToast(rider ? "Donation confirmed! Rider auto-assigned." : "Donation confirmed! Queued for next available rider.");
+      goTo("tracking");
+    }
+
+    function rejectRequest(id) {
+      const request = requests.find(r => r.id === id);
+      if (!request) return;
+      request.status = "Rejected";
+      saveState();
+      renderAll();
+      showToast(`Request ${id} marked as rejected.`);
+    }
+
+    // 6. Rider Management
+    function toggleRiderForm() {
+      const form = document.getElementById("riderFormPanel");
+      form.classList.toggle("hidden");
+    }
+
+    function handleRiderSubmit(e) {
+      e.preventDefault();
+      const name = document.getElementById("riderName").value.trim();
+      const mobile = document.getElementById("riderMobile").value.trim();
+      const vehicle = document.getElementById("vehicle").value;
+      const capacity = Number(document.getElementById("capacity").value);
+      const location = document.getElementById("riderLocation").value.trim();
+
+      riders.push({
+        id: "R-" + Date.now().toString().slice(-4),
+        name,
+        mobile,
+        vehicle,
+        capacity,
+        assigned: 0,
+        location: location || "Flexible / All Zones",
+        available: true,
+        stars: 0
+      });
+
+      saveState();
+      renderAll();
+      toggleRiderForm();
+      showToast("Rider registered successfully and marked available!");
+    }
+
+    function renderRiders() {
+      const box = document.getElementById("riderList");
+      if (!riders.length) {
+        box.innerHTML = `<div class="empty-state full">No delivery riders registered yet.</div>`;
+        return;
+      }
+
+      box.innerHTML = riders.map(r => `
+        <div class="rider-card">
+          <div class="top-line">
+            <div>
+              <h3>${escapeHTML(r.name)}</h3>
+              <small>${escapeHTML(r.id)} • ${escapeHTML(r.mobile)}</small>
+            </div>
+            <span class="badge ${r.available ? 'badge-green' : 'badge-yellow'}">
+              ${r.available ? '● Available' : '● Busy'}
+            </span>
+          </div>
+
+          <div style="font-size: 14px; margin-bottom: 12px; color: var(--text);">
+            <p><strong>Vehicle:</strong> ${escapeHTML(r.vehicle)}</p>
+            <p><strong>Location:</strong> ${escapeHTML(r.location)}</p>
+            <p><strong>Active Load:</strong> ${r.assigned} / ${r.capacity} deliveries</p>
+            <p><strong>⭐ Impact Score:</strong> ${r.stars} points</p>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    // 7. Live Order Tracking
+    function updateOrderStatus(id, newStatus, newProgress) {
+      const order = orders.find(o => o.id === id);
+      if (!order) return;
+
+      order.status = newStatus;
+      order.progress = newProgress;
+
+      // Free rider capacity on Delivery
+      if (newStatus === "Delivered" && order.riderId) {
+        const rider = riders.find(r => r.id === order.riderId);
+        if (rider) {
+          rider.assigned = Math.max(0, rider.assigned - 1);
+          rider.available = true;
+          rider.stars += 5; // Award 5 stars per delivery!
+        }
+      }
+
+      saveState();
+      renderAll();
+      showToast(`Order ${id} is now ${newStatus}`);
+    }
+
+    function renderOrders() {
+      const box = document.getElementById("orderList");
+      if (!orders.length) {
+        box.innerHTML = `<div class="empty-state">No donations made yet. When a donor accepts a request, tracking will start here.</div>`;
+        return;
+      }
+
+      box.innerHTML = orders.map(o => {
+        let remaining = o.expiresAt ? Math.max(0, Math.floor((o.expiresAt - Date.now()) / 1000)) : null;
+
+        if (remaining === 0 && o.status !== "Delivered") {
+          o.status = "Expired";
+        }
+
+        const expiryLabel = remaining === null 
+          ? "Non-perishable" 
+          : remaining > 0 
+            ? `${Math.floor(remaining / 60)}m ${remaining % 60}s left`
+            : "⚠️ EXPIRED";
+
+        let badgeClass = "badge-blue";
+        if (o.status === "Delivered") badgeClass = "badge-green";
+        if (o.status === "Expired") badgeClass = "badge-red";
+        if (o.status === "Waiting for Rider") badgeClass = "badge-yellow";
+
+        return `
+          <div class="order-card" style="margin-bottom: 14px;">
+            <div class="top-line">
+              <div>
+                <h3>${escapeHTML(o.item)} — ${escapeHTML(o.quantity)} units</h3>
+                <small>Order ${escapeHTML(o.id)} • Associated ${escapeHTML(o.requestId)}</small>
+              </div>
+              <span class="badge ${badgeClass}">${escapeHTML(o.status)}</span>
+            </div>
+
+            <div style="font-size: 14px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 8px; margin: 10px 0;">
+              <div>
+                <p><b>Donor:</b> ${escapeHTML(o.donorName)} (${escapeHTML(o.donorPhone)})</p>
+                <p><b>Pickup:</b> ${escapeHTML(o.pickupAddress)}</p>
+              </div>
+              <div>
+                <p><b>Receiver:</b> ${escapeHTML(o.receiverName)} (${escapeHTML(o.receiverMobile)})</p>
+                <p><b>Delivery:</b> ${escapeHTML(o.deliveryAddress)}</p>
+              </div>
+              <div>
+                <p><b>Rider:</b> ${o.riderName ? `${escapeHTML(o.riderName)} (${escapeHTML(o.riderMobile)})` : '<i style="color:var(--text-muted)">Unassigned</i>'}</p>
+                <p><b>Freshness:</b> <span class="countdown-badge" data-order-id="${o.id}">${expiryLabel}</span></p>
+              </div>
+            </div>
+
+            <div class="progress-bar">
+              <div class="progress-fill" style="width: ${o.progress}%;"></div>
+            </div>
+
+            ${o.status !== "Delivered" && o.status !== "Expired" ? `
+              <div class="card-actions">
+                <button class="btn-outline" onclick="updateOrderStatus('${o.id}', 'Picked Up', 50)">
+                  ✓ Mark Picked Up
+                </button>
+                <button class="btn-outline" onclick="updateOrderStatus('${o.id}', 'In Transit', 75)">
+                  🚀 Mark In Transit
+                </button>
+                <button class="btn-primary" onclick="updateOrderStatus('${o.id}', 'Delivered', 100)">
+                  🎉 Mark Delivered
+                </button>
+              </div>
+            ` : ""}
+          </div>
+        `;
+      }).join("");
+    }
+
+    // 8. Admin Moderation
+    function loginAdmin(e) {
+      e.preventDefault();
+      const pwd = document.getElementById("adminPassword").value;
+      if (pwd !== ADMIN_PASSWORD) {
+        showToast("Incorrect password. Default is admin123");
+        return;
+      }
+      document.getElementById("adminLogin").classList.add("hidden");
+      document.getElementById("adminContent").classList.remove("hidden");
+      renderAdmin();
+      showToast("Admin session active.");
+    }
+
+    function logoutAdmin() {
+      document.getElementById("adminLogin").classList.remove("hidden");
+      document.getElementById("adminContent").classList.add("hidden");
+      document.getElementById("adminPassword").value = "";
+    }
+
+    function renderAdmin() {
+      const box = document.getElementById("adminRequests");
+      if (!requests.length) {
+        box.innerHTML = `<div class="empty-state">No requests recorded in the system.</div>`;
+        return;
+      }
+
+      box.innerHTML = requests.map(r => `
+        <div class="panel" style="padding: 16px;">
+          <div class="top-line">
+            <div>
+              <h3>${escapeHTML(r.item)} (${escapeHTML(r.quantity)} units)</h3>
+              <small>${escapeHTML(r.id)} • Receiver: ${escapeHTML(r.receiverName)} (${escapeHTML(r.receiverMobile)})</small>
+            </div>
+            <span class="badge ${r.status === 'Donated' ? 'badge-green' : r.status === 'Rejected' ? 'badge-red' : 'badge-yellow'}">
+              ${escapeHTML(r.status)}
+            </span>
+          </div>
+
+          <p style="font-size: 13px; margin: 8px 0; color: var(--text-muted);">
+            Reason: ${escapeHTML(r.reason)} | Address: ${escapeHTML(r.address)} | Donor: ${escapeHTML(r.donorName || "None yet")}
+          </p>
+
+          ${r.status === "Pending" ? `
+            <div class="card-actions">
+              <button class="btn-primary" style="padding: 5px 10px; font-size: 12px;" onclick="adminApprove('${r.id}')">
+                Approve & Prioritize
+              </button>
+              <button class="btn-danger" style="padding: 5px 10px; font-size: 12px;" onclick="adminReject('${r.id}')">
+                Reject / Remove
+              </button>
+            </div>
+          ` : ""}
+        </div>
+      `).join("");
+    }
+
+    function adminApprove(id) {
+      const req = requests.find(r => r.id === id);
+      if (!req) return;
+      req.status = "Approved & Priority";
+      saveState();
+      renderAll();
+      showToast(`Request ${id} approved.`);
+    }
+
+    function adminReject(id) {
+      const req = requests.find(r => r.id === id);
+      if (!req) return;
+      req.status = "Rejected by Admin";
+      saveState();
+      renderAll();
+      showToast(`Request ${id} rejected.`);
+    }
+
+    // 9. Stats Summary
+    function renderStats() {
+      document.getElementById("totalRequests").textContent = requests.length;
+      document.getElementById("donatedRequests").textContent = requests.filter(r => r.status === "Donated").length;
+      document.getElementById("activeDeliveries").textContent = orders.filter(o => !["Delivered", "Expired"].includes(o.status)).length;
+      document.getElementById("availableRiders").textContent = riders.filter(r => r.available).length;
+    }
+
+    function renderAll() {
+      renderRequests();
+      renderOrders();
+      renderRiders();
+      renderAdmin();
+      renderStats();
+    }
+
+    // Lightweight 1-second timer that ONLY updates expiry countdown text nodes
+    // without destroying/re-rendering DOM or hammering localStorage!
+    setInterval(() => {
+      let needsFullRender = false;
+
+      document.querySelectorAll(".countdown-badge").forEach(el => {
+        const orderId = el.getAttribute("data-order-id");
+        const order = orders.find(o => o.id === orderId);
+        if (order && order.expiresAt) {
+          const diff = Math.floor((order.expiresAt - Date.now()) / 1000);
+          if (diff <= 0) {
+            if (order.status !== "Delivered" && order.status !== "Expired") {
+              order.status = "Expired";
+              needsFullRender = true;
+            }
+            el.textContent = "⚠️ EXPIRED";
+          } else {
+            el.textContent = `${Math.floor(diff / 60)}m ${diff % 60}s left`;
+          }
+        }
+      });
+
+      if (needsFullRender) {
+        saveState();
+        renderOrders();
+        renderStats();
+      }
+    }, 1000);
+
+    // Initial load
+    renderAll();
+  </script>
+
+</body>
+</html>

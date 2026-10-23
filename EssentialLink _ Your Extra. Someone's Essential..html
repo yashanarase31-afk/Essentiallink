@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<!-- saved from url=(0027)http://localhost:8000/#home -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EssentialLink | Your Extra. Someone's Essential.</title>
+  
+  <!-- Leaflet.js for Interactive Live GPS Tracking Map -->
+  <link rel="stylesheet" href="./EssentialLink _ Your Extra. Someone's Essential._files/leaflet.css">
+  <script src="./EssentialLink _ Your Extra. Someone's Essential._files/leaflet.js.download"></script>
+
+  <!-- Google Font: Plus Jakarta Sans for clean, modern aesthetic -->
+  <link rel="preconnect" href="https://fonts.googleapis.com/">
+  <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
+  <link href="./EssentialLink _ Your Extra. Someone's Essential._files/css2" rel="stylesheet">
+
+  <link rel="stylesheet" href="./EssentialLink _ Your Extra. Someone's Essential._files/style.css">
+  <style>
+    body, * { font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif; }
+  </style>
+</head>
+
+<body>
+
+  <!-- Top Sticky Header -->
+  <header>
+    <div class="header-inner">
+      <div class="brand-wrapper">
+        <div class="logo" onclick="navigateTo('home')">
+          <div class="logo-badge">🌱</div>
+          <div>Essential<span>Link</span></div>
+        </div>
+
+        <!-- Top Left Corner: Interactive Demo Video Button -->
+        <button class="demo-video-btn" onclick="openDemoModal()" title="Watch How EssentialLink Works">
+          <div class="play-icon">▶</div>
+          <span>Watch Demo Video</span>
+        </button>
+      </div>
+
+      <!-- Main Navigation with Dedicated Pages -->
+      <nav class="main-nav">
+        <button class="nav-link active" id="nav-home" onclick="navigateTo('home')">
+          Overview
+        </button>
+        <button class="nav-link" id="nav-request" onclick="navigateTo('request')">
+          Place a Request
+        </button>
+        <button class="nav-link" id="nav-donate" onclick="navigateTo('donate')">
+          Explore Requests
+        </button>
+        <button class="nav-link" id="nav-riders" onclick="navigateTo('riders')">
+          Delivery Partners
+        </button>
+        <button class="nav-link" id="nav-tracking" onclick="navigateTo('tracking')">
+          Live Tracking 📍
+        </button>
+        <button class="nav-link" id="nav-admin" onclick="navigateTo('admin')">
+          Admin
+        </button>
+      </nav>
+
+      <!-- Live Sync / Connect Mobile Pill -->
+      <button class="mobile-sync-btn" onclick="openMobileConnectModal()">
+        <div class="status-indicator"></div>
+        <span>📱 Connect Mobile</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Multi-View Pages Container -->
+  <main>
+
+    <!-- =========================================================================
+         PAGE 1: OVERVIEW & HOME
+         ========================================================================= -->
+    <div class="app-page active-page" id="page-home">
+      <div class="hero">
+        <div class="hero-pill">
+          <span>✨</span> Real-time Community Relief Network
+        </div>
+        <h1>Your extra. Someone's <span class="highlight-peach">Essential.</span></h1>
+        <p>
+          Connecting food surplus and vital supplies with those who need them most. 
+          Synchronized across all your devices with real-time GPS delivery tracking.
+        </p>
+
+        <div class="hero-actions">
+          <button class="btn btn-peach" onclick="navigateTo('request')">
+            📦 Place a Request
+          </button>
+          <button class="btn btn-primary" onclick="navigateTo('donate')">
+            🤲 Explore Requests to Donate
+          </button>
+          <button class="btn btn-white" onclick="navigateTo('tracking')">
+            📍 Open Live Tracking Map
+          </button>
+        </div>
+      </div>
+
+      <!-- Live Stats Banner -->
+      <div class="stats-banner">
+        <div class="stat-item">
+          <span class="stat-label">Total Requests</span>
+          <span class="stat-value" id="statTotalRequests">2</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Fulfilled Donations</span>
+          <span class="stat-value" id="statDonatedRequests">1</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Active Deliveries</span>
+          <span class="stat-value" id="statActiveDeliveries">2</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Volunteer Riders</span>
+          <span class="stat-value" id="statAvailableRiders">6</span>
+        </div>
+      </div>
+
+      <!-- Dedicated Portals Cards Grid -->
+      <h3 style="color: var(--lavender-deep); font-size: 22px; margin-bottom: 18px; font-weight: 800;">
+        Explore Dedicated Portals
+      </h3>
+
+      <div class="portals-grid">
+        <!-- Portal Card 1: Receiver -->
+        <div class="portal-card peach-accent" onclick="navigateTo('request')">
+          <div>
+            <div class="portal-icon-wrapper">📦</div>
+            <h3>Receiver Portal</h3>
+            <p>Are you facing a food shortage or medical supply deficit? Post a verified request for prompt community fulfillment.</p>
+          </div>
+          <div class="portal-link-text">Place a Request →</div>
+        </div>
+
+        <!-- Portal Card 2: Donor -->
+        <div class="portal-card" onclick="navigateTo('donate')">
+          <div>
+            <div class="portal-icon-wrapper">🤲</div>
+            <h3>Donor Portal</h3>
+            <p>Browse live urgent requests from shelters, clinics, and families. Pledge surplus items and schedule quick pickup.</p>
+          </div>
+          <div class="portal-link-text">Explore Requests to Donate →</div>
+        </div>
+
+        <!-- Portal Card 3: Riders -->
+        <div class="portal-card" onclick="navigateTo('riders')">
+          <div>
+            <div class="portal-icon-wrapper">🚴</div>
+            <h3>Delivery Partners</h3>
+            <p>Volunteer your scooter, car, or bicycle. Get auto-assigned to transport emergency essentials and earn impact stars.</p>
+          </div>
+          <div class="portal-link-text">Join Volunteer Fleet →</div>
+        </div>
+
+        <!-- Portal Card 4: Live Tracking -->
+        <div class="portal-card peach-accent" onclick="navigateTo('tracking')">
+          <div>
+            <div class="portal-icon-wrapper">📍</div>
+            <h3>Live GPS Tracking</h3>
+            <p>Watch delivery routes on interactive maps with real-time coordinate updates, ETA, distance, and status stages.</p>
+          </div>
+          <div class="portal-link-text">Track Deliveries Live →</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- =========================================================================
+         PAGE 2: PLACE A REQUEST (RECEIVER PORTAL)
+         ========================================================================= -->
+    <div class="app-page" id="page-request">
+      <div class="page-top-bar">
+        <div>
+          <div class="breadcrumbs">
+            <button onclick="navigateTo('home')">Home</button>
+            <span>/</span>
+            <span>Receiver Portal</span>
+          </div>
+          <h2 class="page-title">Place a Relief Request</h2>
+          <p class="page-subtitle">Submit essential needs for food, medicine, or emergency supplies.</p>
+        </div>
+
+        <button class="btn btn-white btn-sm" onclick="navigateTo('home')">
+          ← Back to Overview
+        </button>
+      </div>
+
+      <div class="card-panel" style="max-width: 860px; margin: 0 auto;">
+        <div class="info-notice">
+          <div>ℹ️</div>
+          <div>
+            <b>Immediate Community Visibility:</b> Once submitted, your request is instantly saved to our central database and synchronizes across all donor and volunteer devices on the network.
+          </div>
+        </div>
+
+        <form onsubmit="handleReceiverSubmit(event)">
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="reqName">Receiver or Organization Name *</label>
+              <input id="reqName" required="" placeholder="e.g. Shanti Shelter Home / Rahul Sharma">
+            </div>
+
+            <div class="form-group">
+              <label for="reqMobile">Mobile Number *</label>
+              <input id="reqMobile" type="tel" required="" placeholder="+91 98765 43210">
+            </div>
+
+            <div class="form-group">
+              <label for="reqReason">Reason for Request *</label>
+              <select id="reqReason">
+                <option>Food shortage</option>
+                <option>Medical emergency</option>
+                <option>Night shelter support</option>
+                <option>Flood or disaster relief</option>
+                <option>Family emergency</option>
+                <option>Elderly assistance</option>
+                <option>Other emergency</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="reqCategory">Required Category *</label>
+              <select id="reqCategory">
+                <option>Food &amp; Nutrition</option>
+                <option>Medical Supplies</option>
+                <option>Essential Hygiene Kits</option>
+                <option>Blankets &amp; Warm Clothing</option>
+                <option>Baby Care &amp; Infant Milk</option>
+                <option>Drinking Water</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="reqItem">Specific Item Needed *</label>
+              <input id="reqItem" required="" placeholder="e.g. Cooked Rice &amp; Dal Meals, or Paracetamol &amp; First-aid">
+            </div>
+
+            <div class="form-group">
+              <label for="reqQuantity">Quantity Required *</label>
+              <input id="reqQuantity" type="number" min="1" max="1000" value="20" required="">
+            </div>
+
+            <div class="form-group form-full">
+              <label for="reqAddress">Complete Delivery Address *</label>
+              <input id="reqAddress" required="" placeholder="Building, Street, Landmark, Door / Gate Number" oninput="updateReqGeoPreview()">
+            </div>
+
+            <div class="form-group">
+              <label for="reqLocation">City / Sector / Area *</label>
+              <input id="reqLocation" required="" placeholder="e.g. Pune / AISSMS / Deccan" oninput="updateReqGeoPreview()">
+              <div id="reqGeoBadge" style="font-size: 12px; color: var(--lavender-dark); font-weight: 600; margin-top: 4px;">
+                📍 Map Target: Pune Station / AISSMS Hub (18.5308° N, 73.8647° E)
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="reqDeliveryTime">Preferred Delivery Time</label>
+              <input id="reqDeliveryTime" placeholder="e.g. Urgent / Before 8:00 PM">
+            </div>
+
+            <div class="form-group form-full">
+              <label for="reqNotes">Additional Guidelines or Instructions</label>
+              <textarea id="reqNotes" placeholder="Share any critical details such as dietary preferences, number of elderly persons or children, or road access restrictions..."></textarea>
+            </div>
+          </div>
+
+          <div style="margin-top: 28px; display: flex; gap: 12px; justify-content: flex-end;">
+            <button type="button" class="btn btn-white" onclick="navigateTo('home')">Cancel</button>
+            <button type="submit" class="btn btn-peach" id="btnSubmitRequest">
+              🚀 Post Request to Network
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- =========================================================================
+         PAGE 3: EXPLORE REQUESTS TO DONATE (DONOR PORTAL)
+         ========================================================================= -->
+    <div class="app-page" id="page-donate">
+      <div class="page-top-bar">
+        <div>
+          <div class="breadcrumbs">
+            <button onclick="navigateTo('home')">Home</button>
+            <span>/</span>
+            <span>Donor Portal</span>
+          </div>
+          <h2 class="page-title">Explore Requests Waiting for Donors</h2>
+          <p class="page-subtitle">Pledge surplus resources directly to verified requests in your area.</p>
+        </div>
+
+        <button class="btn btn-white btn-sm" onclick="fetchLiveState()">
+          ↻ Refresh Feed
+        </button>
+      </div>
+
+      <!-- Filters & Category Selector -->
+      <div class="filters-bar">
+        <div class="filter-pills">
+          <button class="filter-pill active" onclick="filterDonorCategory('All', this)">All Categories</button>
+          <button class="filter-pill" onclick="filterDonorCategory('Food &amp; Nutrition', this)">🍲 Food &amp; Nutrition</button>
+          <button class="filter-pill" onclick="filterDonorCategory('Medical Supplies', this)">💊 Medical Supplies</button>
+          <button class="filter-pill" onclick="filterDonorCategory('Essential Hygiene Kits', this)">🧼 Hygiene</button>
+          <button class="filter-pill" onclick="filterDonorCategory('Baby Care &amp; Infant Milk', this)">🍼 Baby Care</button>
+        </div>
+
+        <div style="width: 260px;">
+          <input type="text" id="donorSearchInput" oninput="handleDonorSearch()" placeholder="🔍 Search item or location...">
+        </div>
+      </div>
+
+      <!-- Active Requests Grid -->
+      <div class="requests-grid" id="donorFeedList">
+    <div class="request-card">
+      <div>
+        <div class="card-top">
+          <div>
+            <h4>Hot Cooked Meals</h4>
+            <div class="card-meta">REQ-104921 • Food &amp; Nutrition</div>
+          </div>
+          <span class="badge badge-peach">
+            Pending
+          </span>
+        </div>
+
+        <div style="font-size: 14px; margin-bottom: 16px; color: var(--text-main); display: flex; flex-direction: column; gap: 4px;">
+          <div><b>Quantity:</b> 40 units <span class="multi-rider-badge" style="font-size:10px;">⚡ High Volume (Multi-Rider)</span></div>
+          <div><b>Reason:</b> Food shortage</div>
+          <div><b>Delivery Area:</b> 📍 Pune</div>
+          <div><b>Target Time:</b> Today before 7:30 PM</div>
+          <div style="color: var(--text-muted); font-style: italic; margin-top: 4px;">"Large batch required for evening relief distribution."</div>
+        </div>
+      </div>
+
+      <button class="btn btn-peach" style="width: 100%;" onclick="openPledgeModal('REQ-104921')">
+        🤝 Pledge &amp; Fulfill Donation
+      </button>
+    </div>
+  </div>
+    </div>
+
+    <!-- =========================================================================
+         PAGE 4: DELIVERY PARTNERS & VOLUNTEERS
+         ========================================================================= -->
+    <div class="app-page" id="page-riders">
+      <div class="page-top-bar">
+        <div>
+          <div class="breadcrumbs">
+            <button onclick="navigateTo('home')">Home</button>
+            <span>/</span>
+            <span>Volunteer Fleet</span>
+          </div>
+          <h2 class="page-title">Delivery Partners &amp; Volunteers</h2>
+          <p class="page-subtitle">The vital bridge between generous donors and waiting receivers.</p>
+        </div>
+
+        <button class="btn btn-primary btn-sm" onclick="toggleRiderRegisterPanel()">
+          + Register as Delivery Volunteer
+        </button>
+      </div>
+
+      <!-- Registration Panel (Collapsible) -->
+      <div class="card-panel" id="riderRegisterPanel" style="display: none; margin-bottom: 28px; max-width: 800px;">
+        <h3 style="color: var(--lavender-deep); margin-bottom: 16px;">Join the Volunteer Fleet</h3>
+        <form onsubmit="handleRiderRegister(event)">
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="riderFullName">Full Name *</label>
+              <input id="riderFullName" required="" placeholder="e.g. Amit Sengupta">
+            </div>
+
+            <div class="form-group">
+              <label for="riderPhone">Mobile Number *</label>
+              <input id="riderPhone" type="tel" required="" placeholder="+91 98765 22222">
+            </div>
+
+            <div class="form-group">
+              <label for="riderVehicle">Vehicle Type *</label>
+              <select id="riderVehicle">
+                <option>Motorcycle / Scooter</option>
+                <option>Electric Scooter</option>
+                <option>Bicycle</option>
+                <option>Car / Hatchback</option>
+                <option>Delivery Van</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="riderCapacity">Maximum Parallel Delivery Capacity</label>
+              <input id="riderCapacity" type="number" min="1" max="15" value="4" required="">
+            </div>
+
+            <div class="form-group form-full">
+              <label for="riderHub">Current Hub / Operating Area</label>
+              <input id="riderHub" placeholder="e.g. Central Delhi / South Ext">
+            </div>
+          </div>
+
+          <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: flex-end;">
+            <button type="button" class="btn btn-white btn-sm" onclick="toggleRiderRegisterPanel()">Cancel</button>
+            <button type="submit" class="btn btn-primary btn-sm">Confirm Registration</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Fleet List Grid -->
+      <div class="requests-grid" id="ridersFleetList">
+    <div class="request-card">
+      <div>
+        <div class="card-top">
+          <div>
+            <h4>Rahul Shinde</h4>
+            <div class="card-meta">R-PNE-101 • +91 98220 11223</div>
+          </div>
+          <span class="badge badge-green">
+            ● Available
+          </span>
+        </div>
+
+        <div style="font-size: 14px; margin-bottom: 14px; color: var(--text-main); display: flex; flex-direction: column; gap: 4px;">
+          <div><b>Vehicle:</b> Motorcycle</div>
+          <div><b>Operating Hub:</b> 📍 Pune Station / AISSMS Hub</div>
+          <div><b>Max Single Batch Capacity:</b> 20 units</div>
+          <div><b>Active Deliveries:</b> 1 / 20 loads</div>
+          <div><b>⭐ Star Performer Points:</b> 28 pts</div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="request-card">
+      <div>
+        <div class="card-top">
+          <div>
+            <h4>Priya Kulkarni</h4>
+            <div class="card-meta">R-PNE-102 • +91 98229 88776</div>
+          </div>
+          <span class="badge badge-green">
+            ● Available
+          </span>
+        </div>
+
+        <div style="font-size: 14px; margin-bottom: 14px; color: var(--text-main); display: flex; flex-direction: column; gap: 4px;">
+          <div><b>Vehicle:</b> Electric Scooter</div>
+          <div><b>Operating Hub:</b> 📍 Shivajinagar Hub</div>
+          <div><b>Max Single Batch Capacity:</b> 15 units</div>
+          <div><b>Active Deliveries:</b> 0 / 15 loads</div>
+          <div><b>⭐ Star Performer Points:</b> 34 pts</div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="request-card">
+      <div>
+        <div class="card-top">
+          <div>
+            <h4>Tanmay Joshi</h4>
+            <div class="card-meta">R-PNE-103 • +91 98900 45678</div>
+          </div>
+          <span class="badge badge-green">
+            ● Available
+          </span>
+        </div>
+
+        <div style="font-size: 14px; margin-bottom: 14px; color: var(--text-main); display: flex; flex-direction: column; gap: 4px;">
+          <div><b>Vehicle:</b> Delivery Van</div>
+          <div><b>Operating Hub:</b> 📍 Swargate / Deccan Hub</div>
+          <div><b>Max Single Batch Capacity:</b> 45 units</div>
+          <div><b>Active Deliveries:</b> 1 / 45 loads</div>
+          <div><b>⭐ Star Performer Points:</b> 42 pts</div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="request-card">
+      <div>
+        <div class="card-top">
+          <div>
+            <h4>Sneha Deshmukh</h4>
+            <div class="card-meta">R-PNE-104 • +91 97654 32109</div>
+          </div>
+          <span class="badge badge-green">
+            ● Available
+          </span>
+        </div>
+
+        <div style="font-size: 14px; margin-bottom: 14px; color: var(--text-main); display: flex; flex-direction: column; gap: 4px;">
+          <div><b>Vehicle:</b> Bicycle Express</div>
+          <div><b>Operating Hub:</b> 📍 Kothrud / Deccan Hub</div>
+          <div><b>Max Single Batch Capacity:</b> 10 units</div>
+          <div><b>Active Deliveries:</b> 0 / 10 loads</div>
+          <div><b>⭐ Star Performer Points:</b> 19 pts</div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="request-card">
+      <div>
+        <div class="card-top">
+          <div>
+            <h4>Sameer Merchant</h4>
+            <div class="card-meta">R-MUM-201 • +91 98190 33445</div>
+          </div>
+          <span class="badge badge-green">
+            ● Available
+          </span>
+        </div>
+
+        <div style="font-size: 14px; margin-bottom: 14px; color: var(--text-main); display: flex; flex-direction: column; gap: 4px;">
+          <div><b>Vehicle:</b> Motorcycle</div>
+          <div><b>Operating Hub:</b> 📍 Dadar Central Hub</div>
+          <div><b>Max Single Batch Capacity:</b> 20 units</div>
+          <div><b>Active Deliveries:</b> 0 / 20 loads</div>
+          <div><b>⭐ Star Performer Points:</b> 31 pts</div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="request-card">
+      <div>
+        <div class="card-top">
+          <div>
+            <h4>Vikram Singh</h4>
+            <div class="card-meta">R-DEL-301 • +91 98102 99384</div>
+          </div>
+          <span class="badge badge-green">
+            ● Available
+          </span>
+        </div>
+
+        <div style="font-size: 14px; margin-bottom: 14px; color: var(--text-main); display: flex; flex-direction: column; gap: 4px;">
+          <div><b>Vehicle:</b> Motorcycle</div>
+          <div><b>Operating Hub:</b> 📍 Connaught Place Hub</div>
+          <div><b>Max Single Batch Capacity:</b> 20 units</div>
+          <div><b>Active Deliveries:</b> 0 / 20 loads</div>
+          <div><b>⭐ Star Performer Points:</b> 25 pts</div>
+        </div>
+      </div>
+    </div>
+  </div>
+    </div>
+
+    <!-- =========================================================================
+         PAGE 5: LIVE ORDERS & GPS TRACKING (WITH LEAFLET MAP)
+         ========================================================================= -->
+    <div class="app-page" id="page-tracking">
+      <div class="page-top-bar">
+        <div>
+          <div class="breadcrumbs">
+            <button onclick="navigateTo('home')">Home</button>
+            <span>/</span>
+            <span>Live Tracking</span>
+          </div>
+          <h2 class="page-title">Live Orders &amp; GPS Tracking</h2>
+          <p class="page-subtitle">Real-time route mapping, courier telemetry, and automated delivery progression.</p>
+        </div>
+
+        <button class="btn btn-white btn-sm" onclick="fetchLiveState()">
+          ↻ Sync Coordinates
+        </button>
+      </div>
+
+      <div class="tracking-layout">
+        <!-- Left: Orders List -->
+        <div class="orders-sidebar" id="trackingOrdersList">
+      <div class="order-item-card " onclick="selectOrderForTracking('EL-415570')">
+        <div class="card-top">
+          <div>
+            <h4 style="font-size: 16px;">First-aid &amp; Bandages Kit (10)</h4>
+            <div class="card-meta">Order EL-415570 • 📍 Pune</div>
+          </div>
+          <span class="badge badge-red">Emergency Reassigned</span>
+        </div>
+
+        <div style="font-size: 13px; color: var(--text-main); margin-bottom: 10px; display: flex; flex-direction: column; gap: 3px;">
+          <p><b>Pickup:</b> 🏪 Deccan Gymkhana, Pune</p>
+          <p><b>Drop:</b> 🏠 Opposite Bus Stand, Shivajinagar</p>
+          <p><b>Courier:</b> Rahul Shinde</p>
+          
+          <div style="color: var(--danger); font-size: 11px; font-weight: 700; margin-top: 2px;">⚠️ Reassigned due to traffic delay</div>
+        </div>
+
+        <div class="tracking-progress-bar">
+          <div class="tracking-progress-fill" style="width: 25%;"></div>
+        </div>
+      </div>
+    
+      <div class="order-item-card selected" onclick="selectOrderForTracking('EL-894120')">
+        <div class="card-top">
+          <div>
+            <h4 style="font-size: 16px;">Hot Cooked Meals (35)</h4>
+            <div class="card-meta">Order EL-894120 • 📍 Pune</div>
+          </div>
+          <span class="badge badge-red">Emergency Reassigned</span>
+        </div>
+
+        <div style="font-size: 13px; color: var(--text-main); margin-bottom: 10px; display: flex; flex-direction: column; gap: 3px;">
+          <p><b>Pickup:</b> 🏪 FC Road, Deccan Gymkhana</p>
+          <p><b>Drop:</b> 🏠 Near AISSMS COE Campus, Kennedy Road</p>
+          <p><b>Courier:</b> Tanmay Joshi</p>
+          
+          <div style="color: var(--danger); font-size: 11px; font-weight: 700; margin-top: 2px;">⚠️ Reassigned due to traffic delay</div>
+        </div>
+
+        <div class="tracking-progress-bar">
+          <div class="tracking-progress-fill" style="width: 65%;"></div>
+        </div>
+      </div>
+    </div>
+
+        <!-- Right: Real-time Map & Telemetry Dashboard -->
+        <div class="map-container-wrapper">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+            <div>
+              <h3 id="activeOrderTitle" style="color: var(--lavender-deep); font-size: 18px;">Hot Cooked Meals (35 units) — Order #EL-894120</h3>
+              <small id="activeOrderSub" style="color: var(--text-muted);">Pickup: FC Road, Deccan Gymkhana ➔ Destination: Near AISSMS COE Campus, Kennedy Road</small>
+            </div>
+
+            <div class="live-controls">
+              <button class="btn btn-peach btn-sm" id="btnLiveSim" onclick="toggleLiveGPSSimulation()">
+                ▶ Start Live GPS Movement
+              </button>
+            </div>
+          </div>
+
+          <!-- Leaflet Map Canvas -->
+          <div id="trackingMap"></div>
+
+          <!-- Telemetry Stats Bar -->
+          <div class="telemetry-bar">
+            <div class="telemetry-item">
+              <small>Status</small>
+              <strong id="telemStatus">Emergency Reassigned</strong>
+            </div>
+            <div class="telemetry-item">
+              <small>Est. Distance</small>
+              <strong id="telemDistance">2.4 km</strong>
+            </div>
+            <div class="telemetry-item">
+              <small>ETA</small>
+              <strong id="telemETA">6 mins</strong>
+            </div>
+            <div class="telemetry-item">
+              <small>Current Speed</small>
+              <strong id="telemSpeed">34 km/h</strong>
+            </div>
+          </div>
+
+          <!-- Emergency Delay Banner (Shown if Rider Delayed) -->
+          <div id="emergencyDelayBanner" class="emergency-alert-banner" style="display: flex;">
+            <div style="font-size: 24px;">🚨</div>
+            <div>
+              <h5 id="delayBannerTitle">Emergency Reassignment Protocol Active</h5>
+              <p id="delayBannerText">Previous courier delayed in traffic. Emergency handover to nearest rider Tanmay Joshi (1.77 km away).</p>
+            </div>
+          </div>
+
+          <!-- Multi-Rider Allocation Breakdown (For Large Quantity or Multi-Location Deliveries) -->
+          <div id="multiRiderContainer" style="display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+              <span class="multi-rider-badge">⚡ Split Delivery Across Multiple Couriers</span>
+              <small id="multiRiderCount" style="color: var(--text-muted); font-size: 12px; font-weight: 600;">2 Couriers Active</small>
+            </div>
+            <div class="multi-rider-card-list" id="multiRiderList"></div>
+          </div>
+
+          <!-- Traffic Wait Timer & Emergency Handover Control -->
+          <div class="delay-timer-box" id="delayControlBox">
+            <div>
+              <span>⏱️ <b>Delivery Dispatch Timer:</b> <span id="delayElapsedTimer">21m 42s</span> / 10m limit</span>
+              <div id="delayStatusTag" style="font-size: 11px; color: var(--danger); font-weight: 600; margin-top: 2px;">🚨 Auto-reassigned to nearest backup courier!</div>
+            </div>
+            <button class="btn-emergency" onclick="triggerSimulatedTrafficDelay()">
+              ⚠️ Simulate 10-Min Traffic Delay &amp; Auto-Reassign
+            </button>
+          </div>
+
+          <!-- Stage Progress Action Bar -->
+          <div id="orderStageActions" class="live-controls" style="margin-top: 6px;">
+        <button class="btn btn-white btn-sm" onclick="advanceOrderStatus('EL-894120', 'Picked Up', 50)">
+          ✓ Mark Picked Up
+        </button>
+        <button class="btn btn-white btn-sm" onclick="advanceOrderStatus('EL-894120', 'In Transit', 75)">
+          🛵 Mark In Transit
+        </button>
+        <button class="btn btn-peach btn-sm" onclick="advanceOrderStatus('EL-894120', 'Delivered', 100)">
+          🎉 Complete Delivery
+        </button>
+      </div>
+
+          <!-- Order Dispatch Audit Trail -->
+          <div class="audit-log-panel" id="orderAuditPanel" style="display: block;">
+            <h6>📋 Dispatch &amp; Proximity Routing Audit Log</h6>
+            <div id="orderAuditList">
+        <div class="audit-log-item">ℹ️ Order created. High quantity (35 units) split across 2 nearest riders: Rahul Shinde (20 units) &amp; Priya Kulkarni (15 units).</div>
+      
+        <div class="audit-log-item">ℹ️ 🚨 10-Minute Traffic Delay Triggered: Courier Rahul Shinde &amp; Priya Kulkarni (Split: 2 Riders) was unable to proceed due to heavy traffic. Delivery automatically reassigned to nearest backup rider Tanmay Joshi (1.77 km away).</div>
+      </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- =========================================================================
+         PAGE 6: ADMINISTRATOR PORTAL
+         ========================================================================= -->
+    <div class="app-page" id="page-admin">
+      <div class="page-top-bar">
+        <div>
+          <div class="breadcrumbs">
+            <button onclick="navigateTo('home')">Home</button>
+            <span>/</span>
+            <span>Admin</span>
+          </div>
+          <h2 class="page-title">Administrator Verification Portal</h2>
+          <p class="page-subtitle">Review, approve priority flags, or audit relief requests.</p>
+        </div>
+      </div>
+
+      <div class="card-panel" style="max-width: 800px; margin: 0 auto;">
+        <!-- Admin Login Gate -->
+        <div id="adminLoginSection">
+          <p style="color: var(--text-muted); margin-bottom: 16px;">
+            Administrator credentials are required to modify request verification states. Default password: <code>admin123</code>
+          </p>
+          <form onsubmit="handleAdminLogin(event)" style="max-width: 340px;">
+            <div class="form-group" style="margin-bottom: 14px;">
+              <label for="adminPwdInput">Enter Admin Password</label>
+              <input type="password" id="adminPwdInput" required="" placeholder="admin123">
+            </div>
+            <button type="submit" class="btn btn-primary btn-sm">Unlock Admin Controls</button>
+          </form>
+        </div>
+
+        <!-- Admin Content (Unlocked) -->
+        <div id="adminPanelSection" style="display: none;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <span class="badge badge-green">✓ Administrator Authenticated</span>
+            <button class="btn btn-white btn-sm" onclick="handleAdminLogout()">Logout</button>
+          </div>
+
+          <div id="adminRequestsList" style="display: flex; flex-direction: column; gap: 14px;"></div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- =========================================================================
+       MODAL 1: INTERACTIVE DEMO VIDEO PLAYER (TOP-LEFT CORNER)
+       ========================================================================= -->
+  <div class="modal-overlay" id="demoVideoModal" onclick="handleModalOverlayClick(event, 'demoVideoModal')">
+    <div class="modal-card">
+      <button class="modal-close-btn" onclick="closeModal('demoVideoModal')">×</button>
+      
+      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+        <div class="logo-badge" style="background: var(--peach-light); color: var(--peach-dark);">▶</div>
+        <h3 style="color: var(--lavender-deep); font-size: 20px; font-weight: 800;">
+          How EssentialLink Works (Interactive Tour)
+        </h3>
+      </div>
+      <p style="color: var(--text-muted); font-size: 13px;">
+        Watch the end-to-end lifecycle from relief request to live GPS delivery.
+      </p>
+
+      <!-- Simulated Interactive Stage Canvas -->
+      <div class="demo-stage-screen" id="demoScreen">
+        <div class="stage-icon" id="demoIcon">📦</div>
+        <h4 id="demoStageTitle" style="color: var(--lavender-deep); font-size: 18px;">
+          Stage 1: Receiver Places a Request
+        </h4>
+        <p id="demoStageDesc" style="color: var(--text-muted); font-size: 14px; max-width: 480px;">
+          A community shelter or family facing food scarcity submits an urgent need from any laptop or mobile phone.
+        </p>
+      </div>
+
+      <!-- Demo Player Controls -->
+      <div class="demo-controls-bar">
+        <button class="btn btn-white btn-sm" onclick="prevDemoStage()">⏮ Previous</button>
+        <button class="btn btn-peach btn-sm" id="btnPlayPauseDemo" onclick="toggleDemoPlayback()">
+          ❚❚ Pause
+        </button>
+        <button class="btn btn-white btn-sm" onclick="nextDemoStage()">Next ⏭</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MODAL 2: MOBILE CONNECT & QR CODE (MULTI-DEVICE ACCESS)
+       ========================================================================= -->
+  <div class="modal-overlay" id="mobileConnectModal" onclick="handleModalOverlayClick(event, 'mobileConnectModal')">
+    <div class="modal-card" style="text-align: center; max-width: 520px;">
+      <button class="modal-close-btn" onclick="closeModal('mobileConnectModal')">×</button>
+
+      <div style="font-size: 40px; margin-bottom: 10px;">📱</div>
+      <h3 style="color: var(--lavender-deep); font-size: 22px; margin-bottom: 6px; font-weight: 800;">
+        Open on Your Mobile Phone
+      </h3>
+      <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 20px;">
+        Connect your phone to the same Wi-Fi and open the URL below. Any order placed on your laptop will sync automatically!
+      </p>
+
+      <!-- Live Generated QR Code Container -->
+      <div style="background: white; padding: 16px; border-radius: 12px; display: inline-block; border: 1px solid var(--cream-border); margin-bottom: 16px;">
+        <img id="qrCodeImg" alt="Scan to open on phone" style="width: 180px; height: 180px; display: block;" src="./EssentialLink _ Your Extra. Someone's Essential._files/saved_resource">
+      </div>
+
+      <div style="background: var(--cream); padding: 12px 18px; border-radius: 8px; font-family: monospace; font-size: 15px; color: var(--lavender-deep); margin-bottom: 16px; word-break: break-all;" id="mobileUrlDisplay">http://10.206.158.54:8000</div>
+
+      <button class="btn btn-peach btn-sm" onclick="copyMobileUrl()">
+        📋 Copy Mobile Link
+      </button>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MODAL 3: DONOR PLEDGE FORM
+       ========================================================================= -->
+  <div class="modal-overlay" id="donorPledgeModal" onclick="handleModalOverlayClick(event, 'donorPledgeModal')">
+    <div class="modal-card">
+      <button class="modal-close-btn" onclick="closeModal('donorPledgeModal')">×</button>
+      <h3 style="color: var(--lavender-deep); margin-bottom: 6px;">Fulfill Relief Donation</h3>
+      <div id="pledgeSummaryText" class="peach-notice info-notice" style="margin: 16px 0;"></div>
+
+      <form onsubmit="handleDonationConfirm(event)">
+        <div class="form-group" style="margin-bottom: 14px;">
+          <label for="donorNameInput">Donor / Organization Name *</label>
+          <input id="donorNameInput" required="" placeholder="e.g. Green Bakery / Dr. Alok">
+        </div>
+
+        <div class="form-group" style="margin-bottom: 14px;">
+          <label for="donorPhoneInput">Contact Mobile *</label>
+          <input id="donorPhoneInput" type="tel" required="" placeholder="+91 99100 88221">
+        </div>
+
+        <div class="form-group" style="margin-bottom: 14px;">
+          <label for="donorPickupInput">Pickup Address (Where Rider should collect) *</label>
+          <input id="donorPickupInput" required="" placeholder="e.g. FC Road, Deccan Gymkhana, Pune" oninput="updateDonorGeoPreview()">
+          <div id="donorGeoBadge" style="font-size: 12px; color: var(--peach-dark); font-weight: 600; margin-top: 4px;">
+            📍 Nearest Courier Matching: Proximity distance calculated live from this address
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 14px;">
+          <label for="donorExpirySelect">Freshness / Expiration Time</label>
+          <select id="donorExpirySelect">
+            <option value="45">Cooked meals — Expires in 45 mins</option>
+            <option value="60" selected="">Fresh meals — Expires in 60 mins</option>
+            <option value="120">Perishable — Expires in 2 hours</option>
+            <option value="0">Non-perishable (Does not expire)</option>
+          </select>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 22px;">
+          <label for="donorNotesInput">Pickup Instructions for Delivery Rider</label>
+          <textarea id="donorNotesInput" placeholder="e.g. Boxes are sealed at rear entrance, ring bell 3B"></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-peach" style="width: 100%;">
+          🤝 Confirm Donation &amp; Auto-Assign Rider
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification Bar -->
+  <div id="toastNotification">
+    <span id="toastIcon">🔔</span>
+    <span id="toastMessage">Notification message</span>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-col">
+        <h4>EssentialLink</h4>
+        <p>Your extra. Someone's Essential.</p>
+        <p>A decentralized humanitarian response framework eliminating food waste and connecting urgent community needs.</p>
+      </div>
+
+      <div class="footer-col">
+        <h4>Dedicated Portals</h4>
+        <p><a href="javascript:void(0)" onclick="navigateTo('request')">Request Food &amp; Supplies</a></p>
+        <p><a href="javascript:void(0)" onclick="navigateTo('donate')">Explore Donation Needs</a></p>
+        <p><a href="javascript:void(0)" onclick="navigateTo('riders')">Volunteer Fleet Hub</a></p>
+        <p><a href="javascript:void(0)" onclick="navigateTo('tracking')">Live GPS Route Tracker</a></p>
+      </div>
+
+      <div class="footer-col">
+        <h4>24/7 Relief Helpline</h4>
+        <p>📞 Emergency Toll-Free: +91 98765 43210</p>
+        <p>🚨 Priority Dispatch Desk: Available 24 hours</p>
+        <p>✉️ <a href="mailto:support@essentiallink.org">support@essentiallink.org</a></p>
+      </div>
+
+      <div class="footer-col">
+        <h4>Multi-Device Synchronization</h4>
+        <p>Active Real-Time Backend Service</p>
+        <p style="margin-top: 6px;">
+          <button class="btn btn-white btn-sm" onclick="openMobileConnectModal()">
+            📱 Open on Mobile Phone
+          </button>
+        </p>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <div>© 2026 EssentialLink Relief Foundation. All rights reserved.</div>
+      <div>Designed with Lavender, Peach, White &amp; Cream aesthetics.</div>
+    </div>
+  </footer>
+
+  <script src="./EssentialLink _ Your Extra. Someone's Essential._files/app.js.download"></script>
+
+
+</body></html>

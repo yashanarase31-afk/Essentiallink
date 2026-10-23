@@ -1,0 +1,1379 @@
+/**
+ * EssentialLink - Front-End Application Logic
+ * Multi-Device Real-Time Sync, Interactive Leaflet GPS Tracking, 
+ * Multi-Rider Splitting, Nearest Courier Proximity Routing & Traffic Delay Auto-Reassignment
+ */
+
+// Rich Seed Dataset for Offline / Standalone Use (Pune & Metro Fleet)
+const DEFAULT_OFFLINE_DATA = {
+  requests: [
+    {
+      id: "REQ-104921",
+      receiverName: "AISSMS Relief Camp Center",
+      receiverMobile: "+91 94200 36447",
+      reason: "Food shortage",
+      category: "Food & Nutrition",
+      item: "Hot Cooked Meals",
+      quantity: 40,
+      address: "Near AISSMS COE Campus, Kennedy Road",
+      location: "Pune",
+      lat: 18.5308,
+      lng: 73.8647,
+      deliveryTime: "Today before 7:30 PM",
+      notes: "Large batch required for evening relief distribution.",
+      status: "Pending",
+      createdAt: Date.now() - 3600000
+    },
+    {
+      id: "REQ-104880",
+      receiverName: "Shivajinagar Clinic",
+      receiverMobile: "+91 98111 55667",
+      reason: "Medical emergency",
+      category: "Medical Supplies",
+      item: "First-aid & Bandages Kit",
+      quantity: 10,
+      address: "Opposite Bus Stand, Shivajinagar",
+      location: "Pune",
+      lat: 18.5314,
+      lng: 73.8446,
+      deliveryTime: "Immediate",
+      notes: "Urgent emergency kit requirement for walk-in patients.",
+      status: "Pending",
+      createdAt: Date.now() - 7200000
+    }
+  ],
+  orders: [
+    {
+      id: "EL-894120",
+      requestId: "REQ-104921",
+      item: "Hot Cooked Meals",
+      category: "Food & Nutrition",
+      quantity: 35,
+      receiverName: "AISSMS Relief Camp Center",
+      receiverMobile: "+91 94200 36447",
+      deliveryAddress: "Near AISSMS COE Campus, Kennedy Road",
+      deliveryLocation: "Pune",
+      receiverLat: 18.5308,
+      receiverLng: 73.8647,
+      donorName: "Annapurna Kitchen",
+      donorPhone: "+91 98230 44556",
+      pickupAddress: "FC Road, Deccan Gymkhana",
+      donorLat: 18.518,
+      donorLng: 73.842,
+      pickupNotes: "Cartons packed in clean thermal carriers.",
+      expiry: 60,
+      expiresAt: Date.now() + 3600 * 1000,
+      assignedAt: Date.now() - 280000,
+      status: "In Transit",
+      progress: 65,
+      isDelayed: false,
+      delayReason: "",
+      assignedRiders: [
+        {
+          riderId: "R-PNE-101",
+          riderName: "Rahul Shinde",
+          mobile: "+91 98220 11223",
+          vehicle: "Motorcycle",
+          assignedUnits: 20,
+          distanceKm: 1.4,
+          status: "In Transit",
+          lat: 18.524,
+          lng: 73.851
+        },
+        {
+          riderId: "R-PNE-102",
+          riderName: "Priya Kulkarni",
+          mobile: "+91 98229 88776",
+          vehicle: "Electric Scooter",
+          assignedUnits: 15,
+          distanceKm: 2.1,
+          status: "In Transit",
+          lat: 18.526,
+          lng: 73.849
+        }
+      ],
+      riderId: "R-PNE-101",
+      riderName: "Rahul Shinde & Priya Kulkarni (Split: 2 Couriers)",
+      riderMobile: "+91 98220 11223",
+      riderLat: 18.524,
+      riderLng: 73.851,
+      createdAt: Date.now() - 1800000,
+      auditLog: [
+        "Order created. High quantity (35 units) split across 2 nearest couriers: Rahul Shinde (20 units) & Priya Kulkarni (15 units)."
+      ]
+    }
+  ],
+  riders: [
+    {
+      id: "R-PNE-101",
+      name: "Rahul Shinde",
+      mobile: "+91 98220 11223",
+      vehicle: "Motorcycle",
+      capacity: 20,
+      assigned: 1,
+      location: "Pune Station / AISSMS Hub",
+      lat: 18.53,
+      lng: 73.864,
+      available: true,
+      stars: 28
+    },
+    {
+      id: "R-PNE-102",
+      name: "Priya Kulkarni",
+      mobile: "+91 98229 88776",
+      vehicle: "Electric Scooter",
+      capacity: 15,
+      assigned: 1,
+      location: "Shivajinagar Hub",
+      lat: 18.532,
+      lng: 73.845,
+      available: true,
+      stars: 34
+    },
+    {
+      id: "R-PNE-103",
+      name: "Tanmay Joshi",
+      mobile: "+91 98900 45678",
+      vehicle: "Delivery Van",
+      capacity: 45,
+      assigned: 0,
+      location: "Swargate / Deccan Hub",
+      lat: 18.508,
+      lng: 73.855,
+      available: true,
+      stars: 42
+    },
+    {
+      id: "R-PNE-104",
+      name: "Sneha Deshmukh",
+      mobile: "+91 97654 32109",
+      vehicle: "Bicycle Express",
+      capacity: 10,
+      assigned: 0,
+      location: "Kothrud / Deccan Hub",
+      lat: 18.51,
+      lng: 73.818,
+      available: true,
+      stars: 19
+    }
+  ]
+};
+
+// Global State initialized from LocalStorage or Default Dataset
+const savedOffline = JSON.parse(localStorage.getItem("essentialLinkLocalState") || "null") || DEFAULT_OFFLINE_DATA;
+
+let appState = {
+  requests: savedOffline.requests || DEFAULT_OFFLINE_DATA.requests,
+  orders: savedOffline.orders || DEFAULT_OFFLINE_DATA.orders,
+  riders: savedOffline.riders || DEFAULT_OFFLINE_DATA.riders,
+  stats: {
+    totalRequests: (savedOffline.requests || []).length,
+    donatedRequests: (savedOffline.requests || []).filter(r => r.status === "Donated").length,
+    activeDeliveries: (savedOffline.orders || []).filter(o => !["Delivered", "Expired"].includes(o.status)).length,
+    availableRiders: (savedOffline.riders || []).filter(r => r.available).length
+  },
+  selectedOrderId: (savedOffline.orders && savedOffline.orders[0]) ? savedOffline.orders[0].id : null,
+  selectedRequestId: null,
+  activeDonorFilter: "All",
+  searchTerm: "",
+  isAdminLoggedIn: false,
+  serverInfo: {
+    mobile_url: window.location.origin
+  }
+};
+
+function saveOfflineState() {
+  localStorage.setItem("essentialLinkLocalState", JSON.stringify({
+    requests: appState.requests,
+    orders: appState.orders,
+    riders: appState.riders
+  }));
+}
+
+// Map & GPS Tracking Globals
+let leafletMap = null;
+let pickupMarker = null;
+let dropMarker = null;
+let riderMarkers = []; // Array of markers for multi-rider fleets
+let routePolylines = [];
+let isSimulatingGPS = false;
+let simInterval = null;
+let delayTimerInterval = null;
+
+// Demo Video Player Globals
+let demoStageIndex = 0;
+let demoPlayInterval = null;
+let isDemoPlaying = true;
+const demoStages = [
+  {
+    icon: "📦",
+    title: "Stage 1: Receiver Places a Request",
+    desc: "A shelter home or clinic submits a request. The system instantly resolves exact street coordinates (Pune, Mumbai, Delhi, etc.)."
+  },
+  {
+    icon: "⚡",
+    title: "Stage 2: Real-time Cloud Synchronization",
+    desc: "Central database syncs across all laptop and mobile screens within 2 seconds without page refreshes."
+  },
+  {
+    icon: "🛵",
+    title: "Stage 3: Proximity Nearest-Rider Priority & Splitting",
+    desc: "System calculates Haversine distance, prioritizes the nearest available courier, and automatically splits high-quantity loads across multiple riders."
+  },
+  {
+    icon: "🚨",
+    title: "Stage 4: Traffic Delay Fallback & Emergency Handover",
+    desc: "If a courier is stuck in traffic over 10 minutes, the emergency protocol auto-reassigns the delivery to the next nearest backup courier."
+  }
+];
+
+// Helper: Escape HTML to prevent XSS
+function escapeHTML(str) {
+  if (!str) return "";
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+// Coordinate Dictionary for Client-Side Instant Location Resolver
+const LOCAL_GEO_DICT = {
+  "aissms": { name: "Pune Station / AISSMS Hub", lat: 18.5308, lng: 73.8647 },
+  "pune": { name: "Pune Central", lat: 18.5204, lng: 73.8567 },
+  "shivajinagar": { name: "Shivajinagar Hub, Pune", lat: 18.5314, lng: 73.8446 },
+  "kothrud": { name: "Kothrud, Pune", lat: 18.5074, lng: 73.8077 },
+  "deccan": { name: "Deccan Gymkhana, Pune", lat: 18.5167, lng: 73.8417 },
+  "viman nagar": { name: "Viman Nagar, Pune", lat: 18.5679, lng: 73.9143 },
+  "hadapsar": { name: "Hadapsar, Pune", lat: 18.5089, lng: 73.9259 },
+  "hinjewadi": { name: "Hinjewadi Tech Hub, Pune", lat: 18.5913, lng: 73.7389 },
+  "mumbai": { name: "Mumbai Central", lat: 19.0760, lng: 72.8777 },
+  "dadar": { name: "Dadar Hub, Mumbai", lat: 19.0178, lng: 72.8478 },
+  "bandra": { name: "Bandra, Mumbai", lat: 19.0596, lng: 72.8295 },
+  "delhi": { name: "Delhi Central", lat: 28.6139, lng: 77.2090 },
+  "connaught place": { name: "Connaught Place, Delhi", lat: 28.6315, lng: 77.2167 },
+  "saket": { name: "Saket, New Delhi", lat: 28.5244, lng: 77.2155 }
+};
+
+function resolveClientCoords(query) {
+  if (!query) return { name: "Pune Station / AISSMS Hub", lat: 18.5308, lng: 73.8647 };
+  const q = query.toLowerCase();
+  for (const [key, val] of Object.entries(LOCAL_GEO_DICT)) {
+    if (q.includes(key)) return val;
+  }
+  return { name: "Pune / AISSMS Hub Area", lat: 18.5308, lng: 73.8647 };
+}
+
+// Live geocode preview as user types
+function updateReqGeoPreview() {
+  const loc = document.getElementById("reqLocation")?.value || "";
+  const addr = document.getElementById("reqAddress")?.value || "";
+  const match = resolveClientCoords(`${loc} ${addr}`);
+  const badge = document.getElementById("reqGeoBadge");
+  if (badge) {
+    badge.innerHTML = `📍 Map Target: <b>${match.name}</b> (${match.lat.toFixed(4)}° N, ${match.lng.toFixed(4)}° E)`;
+  }
+}
+
+function updateDonorGeoPreview() {
+  const addr = document.getElementById("donorPickupInput")?.value || "";
+  const match = resolveClientCoords(addr);
+  const badge = document.getElementById("donorGeoBadge");
+  if (badge) {
+    badge.innerHTML = `📍 Pickup Geo-Point: <b>${match.name}</b> (${match.lat.toFixed(4)}° N, ${match.lng.toFixed(4)}° E) — Nearest courier prioritized!`;
+  }
+}
+
+// =========================================================================
+// 1. Multi-Page Navigation Router
+// =========================================================================
+function navigateTo(pageId) {
+  document.querySelectorAll(".app-page").forEach(page => {
+    page.classList.remove("active-page");
+  });
+
+  document.querySelectorAll(".nav-link").forEach(link => {
+    link.classList.remove("active");
+  });
+
+  const targetPage = document.getElementById(`page-${pageId}`);
+  if (targetPage) {
+    targetPage.classList.add("active-page");
+  }
+
+  const targetNav = document.getElementById(`nav-${pageId}`);
+  if (targetNav) {
+    targetNav.classList.add("active");
+  }
+
+  window.location.hash = pageId;
+  window.scrollTo({ top: 0, behavior: "smooth" });
+
+  if (pageId === "tracking") {
+    setTimeout(() => {
+      initOrUpdateMap();
+    }, 200);
+  }
+}
+
+window.addEventListener("hashchange", () => {
+  const hash = window.location.hash.replace("#", "") || "home";
+  navigateTo(hash);
+});
+
+// =========================================================================
+// 2. Real-Time Backend API Sync (Laptop <-> Mobile)
+// =========================================================================
+async function fetchLiveState() {
+  try {
+    const res = await fetch("/api/state");
+    if (!res.ok) throw new Error("Server response not ok");
+    const data = await res.json();
+
+    appState.requests = data.requests || [];
+    appState.orders = data.orders || [];
+    appState.riders = data.riders || [];
+    appState.stats = data.stats || appState.stats;
+
+    renderStats();
+    renderDonorFeed();
+    renderRidersFleet();
+    renderTrackingSidebar();
+    renderAdminRequests();
+
+    if (!appState.selectedOrderId && appState.orders.length > 0) {
+      selectOrderForTracking(appState.orders[0].id);
+    } else if (appState.selectedOrderId) {
+      updateOrderTelemetryDisplay();
+    }
+  } catch (err) {
+    // Offline / Standalone file:// mode: Render from local dataset
+    renderStats();
+    renderDonorFeed();
+    renderRidersFleet();
+    renderTrackingSidebar();
+    renderAdminRequests();
+
+    if (!appState.selectedOrderId && appState.orders.length > 0) {
+      selectOrderForTracking(appState.orders[0].id);
+    } else if (appState.selectedOrderId) {
+      updateOrderTelemetryDisplay();
+    }
+  }
+}
+
+async function fetchServerInfo() {
+  try {
+    const res = await fetch("/api/info");
+    if (res.ok) {
+      const data = await res.json();
+      appState.serverInfo = data;
+      const display = document.getElementById("mobileUrlDisplay");
+      if (display) display.textContent = data.mobile_url;
+      const qrImg = document.getElementById("qrCodeImg");
+      if (qrImg) {
+        qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(data.mobile_url)}`;
+      }
+    }
+  } catch (err) {
+    console.error("Could not fetch server connection info", err);
+  }
+}
+
+// 2-second live polling loop for instant sync across laptop and mobile devices
+setInterval(fetchLiveState, 2000);
+
+// =========================================================================
+// 3. UI Render Functions
+// =========================================================================
+function renderStats() {
+  document.getElementById("statTotalRequests").textContent = appState.requests.length;
+  document.getElementById("statDonatedRequests").textContent = 
+    appState.requests.filter(r => r.status === "Donated").length;
+  document.getElementById("statActiveDeliveries").textContent = 
+    appState.orders.filter(o => !["Delivered", "Expired"].includes(o.status)).length;
+  document.getElementById("statAvailableRiders").textContent = 
+    appState.riders.filter(r => r.available).length;
+}
+
+function renderDonorFeed() {
+  const container = document.getElementById("donorFeedList");
+  if (!container) return;
+
+  let filtered = appState.requests.filter(r => 
+    r.status === "Pending" || r.status.includes("Approved")
+  );
+
+  if (appState.activeDonorFilter !== "All") {
+    filtered = filtered.filter(r => r.category === appState.activeDonorFilter);
+  }
+
+  if (appState.searchTerm) {
+    const q = appState.searchTerm.toLowerCase();
+    filtered = filtered.filter(r => 
+      (r.item && r.item.toLowerCase().includes(q)) ||
+      (r.address && r.address.toLowerCase().includes(q)) ||
+      (r.location && r.location.toLowerCase().includes(q)) ||
+      (r.receiverName && r.receiverName.toLowerCase().includes(q))
+    );
+  }
+
+  if (filtered.length === 0) {
+    container.innerHTML = `
+      <div class="card-panel" style="grid-column: 1 / -1; text-align: center; padding: 48px 24px;">
+        <div style="font-size: 36px; margin-bottom: 12px;">🌟</div>
+        <h4 style="color: var(--lavender-deep); font-size: 18px;">No Pending Requests in this Category</h4>
+        <p style="color: var(--text-muted); font-size: 14px; margin-top: 6px;">
+          All requests are currently fulfilled or under review. Place a new request from the Receiver Portal!
+        </p>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = filtered.map(r => `
+    <div class="request-card">
+      <div>
+        <div class="card-top">
+          <div>
+            <h4>${escapeHTML(r.item)}</h4>
+            <div class="card-meta">${escapeHTML(r.id)} • ${escapeHTML(r.category)}</div>
+          </div>
+          <span class="badge ${r.status.includes('Approved') ? 'badge-green' : 'badge-peach'}">
+            ${escapeHTML(r.status)}
+          </span>
+        </div>
+
+        <div style="font-size: 14px; margin-bottom: 16px; color: var(--text-main); display: flex; flex-direction: column; gap: 4px;">
+          <div><b>Quantity:</b> ${escapeHTML(r.quantity)} units ${r.quantity > 20 ? '<span class="multi-rider-badge" style="font-size:10px;">⚡ High Volume (Multi-Rider)</span>' : ''}</div>
+          <div><b>Reason:</b> ${escapeHTML(r.reason)}</div>
+          <div><b>Delivery Area:</b> 📍 ${escapeHTML(r.location || r.address)}</div>
+          <div><b>Target Time:</b> ${escapeHTML(r.deliveryTime || "Urgent / ASAP")}</div>
+          ${r.notes ? `<div style="color: var(--text-muted); font-style: italic; margin-top: 4px;">"${escapeHTML(r.notes)}"</div>` : ""}
+        </div>
+      </div>
+
+      <button class="btn btn-peach" style="width: 100%;" onclick="openPledgeModal('${r.id}')">
+        🤝 Pledge & Fulfill Donation
+      </button>
+    </div>
+  `).join("");
+}
+
+function filterDonorCategory(cat, btn) {
+  appState.activeDonorFilter = cat;
+  document.querySelectorAll(".filter-pill").forEach(p => p.classList.remove("active"));
+  if (btn) btn.classList.add("active");
+  renderDonorFeed();
+}
+
+function handleDonorSearch() {
+  const input = document.getElementById("donorSearchInput");
+  appState.searchTerm = input ? input.value.trim() : "";
+  renderDonorFeed();
+}
+
+function renderRidersFleet() {
+  const container = document.getElementById("ridersFleetList");
+  if (!container) return;
+
+  if (appState.riders.length === 0) {
+    container.innerHTML = `<div class="card-panel" style="grid-column: 1 / -1; text-align: center;">No delivery volunteers registered yet.</div>`;
+    return;
+  }
+
+  container.innerHTML = appState.riders.map(r => `
+    <div class="request-card">
+      <div>
+        <div class="card-top">
+          <div>
+            <h4>${escapeHTML(r.name)}</h4>
+            <div class="card-meta">${escapeHTML(r.id)} • ${escapeHTML(r.mobile)}</div>
+          </div>
+          <span class="badge ${r.available ? 'badge-green' : 'badge-amber'}">
+            ${r.available ? '● Available' : '● Busy with Order'}
+          </span>
+        </div>
+
+        <div style="font-size: 14px; margin-bottom: 14px; color: var(--text-main); display: flex; flex-direction: column; gap: 4px;">
+          <div><b>Vehicle:</b> ${escapeHTML(r.vehicle)}</div>
+          <div><b>Operating Hub:</b> 📍 ${escapeHTML(r.location)}</div>
+          <div><b>Max Single Batch Capacity:</b> ${r.capacity} units</div>
+          <div><b>Active Deliveries:</b> ${r.assigned || 0} / ${r.capacity} loads</div>
+          <div><b>⭐ Star Performer Points:</b> ${r.stars || 0} pts</div>
+        </div>
+      </div>
+    </div>
+  `).join("");
+}
+
+function toggleRiderRegisterPanel() {
+  const p = document.getElementById("riderRegisterPanel");
+  if (p) {
+    p.style.display = p.style.display === "none" ? "block" : "none";
+  }
+}
+
+// =========================================================================
+// 4. Live Orders & GPS Tracking Map with Multi-Rider Support
+// =========================================================================
+function renderTrackingSidebar() {
+  const container = document.getElementById("trackingOrdersList");
+  if (!container) return;
+
+  if (appState.orders.length === 0) {
+    container.innerHTML = `
+      <div class="card-panel" style="text-align: center; padding: 36px 18px;">
+        <p style="color: var(--text-muted); font-size: 14px;">
+          No active delivery orders yet. Pledging a request will start live tracking here!
+        </p>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = appState.orders.map(o => {
+    const isSelected = o.id === appState.selectedOrderId;
+    let badgeClass = "badge-lavender";
+    if (o.status === "Delivered") badgeClass = "badge-green";
+    if (o.status === "In Transit") badgeClass = "badge-peach";
+    if (o.status === "Expired") badgeClass = "badge-red";
+    if (o.status.includes("Emergency") || o.isDelayed) badgeClass = "badge-red";
+
+    const hasMultiRiders = o.assignedRiders && o.assignedRiders.length > 1;
+
+    return `
+      <div class="order-item-card ${isSelected ? 'selected' : ''}" onclick="selectOrderForTracking('${o.id}')">
+        <div class="card-top">
+          <div>
+            <h4 style="font-size: 16px;">${escapeHTML(o.item)} (${escapeHTML(o.quantity)})</h4>
+            <div class="card-meta">Order ${escapeHTML(o.id)} • 📍 ${escapeHTML(o.deliveryLocation || "Pune")}</div>
+          </div>
+          <span class="badge ${badgeClass}">${escapeHTML(o.status)}</span>
+        </div>
+
+        <div style="font-size: 13px; color: var(--text-main); margin-bottom: 10px; display: flex; flex-direction: column; gap: 3px;">
+          <p><b>Pickup:</b> 🏪 ${escapeHTML(o.pickupAddress)}</p>
+          <p><b>Drop:</b> 🏠 ${escapeHTML(o.deliveryAddress)}</p>
+          <p><b>Courier:</b> ${escapeHTML(o.riderName || 'Matching nearest rider...')}</p>
+          ${hasMultiRiders ? `<span class="multi-rider-badge" style="width: fit-content; margin-top: 4px;">⚡ Split Order: ${o.assignedRiders.length} Couriers Dispatched</span>` : ''}
+          ${o.isDelayed ? `<div style="color: var(--danger); font-size: 11px; font-weight: 700; margin-top: 2px;">⚠️ Reassigned due to traffic delay</div>` : ''}
+        </div>
+
+        <div class="tracking-progress-bar">
+          <div class="tracking-progress-fill" style="width: ${o.progress}%;"></div>
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
+function selectOrderForTracking(orderId) {
+  appState.selectedOrderId = orderId;
+  renderTrackingSidebar();
+  updateOrderTelemetryDisplay();
+  initOrUpdateMap();
+}
+
+function updateOrderTelemetryDisplay() {
+  const order = appState.orders.find(o => o.id === appState.selectedOrderId);
+  if (!order) return;
+
+  document.getElementById("activeOrderTitle").textContent = 
+    `${order.item} (${order.quantity} units) — Order #${order.id}`;
+  document.getElementById("activeOrderSub").textContent = 
+    `Pickup: ${order.pickupAddress} ➔ Destination: ${order.deliveryAddress}`;
+
+  document.getElementById("telemStatus").textContent = order.status;
+  document.getElementById("telemDistance").textContent = 
+    order.status === "Delivered" ? "0.0 km" : "2.4 km";
+  document.getElementById("telemETA").textContent = 
+    order.status === "Delivered" ? "Completed" : "6 mins";
+
+  // Multi-Rider allocation display
+  const multiContainer = document.getElementById("multiRiderContainer");
+  const multiList = document.getElementById("multiRiderList");
+  if (multiContainer && multiList) {
+    if (order.assignedRiders && order.assignedRiders.length > 1) {
+      multiContainer.style.display = "block";
+      document.getElementById("multiRiderCount").textContent = `${order.assignedRiders.length} Couriers Active`;
+      multiList.innerHTML = order.assignedRiders.map((r, idx) => `
+        <div class="multi-rider-row">
+          <div class="rider-meta">
+            <span style="font-weight: 700; color: var(--peach-dark);">Rider #${idx + 1}:</span>
+            <b>${escapeHTML(r.riderName)}</b> (${escapeHTML(r.vehicle)})
+          </div>
+          <div>
+            <span class="badge badge-lavender">${r.assignedUnits} units</span>
+            <span style="color: var(--text-muted); font-size: 11px; margin-left: 6px;">📍 ${r.distanceKm} km away</span>
+          </div>
+        </div>
+      `).join("");
+    } else {
+      multiContainer.style.display = "none";
+    }
+  }
+
+  // Emergency Delay Banner & Timer
+  const delayBanner = document.getElementById("emergencyDelayBanner");
+  const delayStatusTag = document.getElementById("delayStatusTag");
+  if (delayBanner) {
+    if (order.isDelayed) {
+      delayBanner.style.display = "flex";
+      document.getElementById("delayBannerText").textContent = order.delayReason || "Courier delayed >10m in traffic. Order auto-reassigned to nearest backup rider.";
+      if (delayStatusTag) {
+        delayStatusTag.textContent = "🚨 Auto-reassigned to nearest backup courier!";
+        delayStatusTag.style.color = "var(--danger)";
+      }
+    } else {
+      delayBanner.style.display = "none";
+      if (delayStatusTag) {
+        delayStatusTag.textContent = "● Courier moving on schedule";
+        delayStatusTag.style.color = "var(--success)";
+      }
+    }
+  }
+
+  // Dispatch Audit Log
+  const auditPanel = document.getElementById("orderAuditPanel");
+  const auditList = document.getElementById("orderAuditList");
+  if (auditPanel && auditList) {
+    if (order.auditLog && order.auditLog.length > 0) {
+      auditPanel.style.display = "block";
+      auditList.innerHTML = order.auditLog.map(log => `
+        <div class="audit-log-item">ℹ️ ${escapeHTML(log)}</div>
+      `).join("");
+    } else {
+      auditPanel.style.display = "none";
+    }
+  }
+
+  // Action Buttons
+  const actions = document.getElementById("orderStageActions");
+  if (actions) {
+    if (order.status !== "Delivered" && order.status !== "Expired") {
+      actions.innerHTML = `
+        <button class="btn btn-white btn-sm" onclick="advanceOrderStatus('${order.id}', 'Picked Up', 50)">
+          ✓ Mark Picked Up
+        </button>
+        <button class="btn btn-white btn-sm" onclick="advanceOrderStatus('${order.id}', 'In Transit', 75)">
+          🛵 Mark In Transit
+        </button>
+        <button class="btn btn-peach btn-sm" onclick="advanceOrderStatus('${order.id}', 'Delivered', 100)">
+          🎉 Complete Delivery
+        </button>
+      `;
+    } else {
+      actions.innerHTML = `
+        <span class="badge badge-green" style="padding: 8px 14px; font-size: 13px;">
+          ✓ Delivery Completed Successfully
+        </span>
+      `;
+    }
+  }
+}
+
+// 10-Minute Delay Timer loop
+clearInterval(delayTimerInterval);
+delayTimerInterval = setInterval(() => {
+  const order = appState.orders.find(o => o.id === appState.selectedOrderId);
+  const timerEl = document.getElementById("delayElapsedTimer");
+  if (!order || !timerEl) return;
+
+  if (order.status === "Delivered" || order.status === "Expired") {
+    timerEl.textContent = "Delivery Concluded";
+    return;
+  }
+
+  const assignedAt = order.assignedAt || order.createdAt || Date.now();
+  const elapsedSec = Math.floor((Date.now() - assignedAt) / 1000);
+  const mins = Math.floor(elapsedSec / 60);
+  const secs = elapsedSec % 60;
+
+  timerEl.textContent = `${mins}m ${secs < 10 ? '0' : ''}${secs}s`;
+
+  // Auto trigger emergency handover if elapsed >= 10 mins (600s) and not already delayed
+  if (elapsedSec >= 600 && !order.isDelayed) {
+    triggerSimulatedTrafficDelay();
+  }
+}, 1000);
+
+async function triggerSimulatedTrafficDelay() {
+  const order = appState.orders.find(o => o.id === appState.selectedOrderId);
+  if (!order) {
+    showToast("Please select an active order first.");
+    return;
+  }
+
+  showToast("⚠️ Simulating 10-min traffic bottleneck... Searching nearest backup courier.");
+
+  try {
+    const res = await fetch(`/api/orders/${order.id}/emergency-reassign`, {
+      method: "POST"
+    });
+    const data = await res.json();
+    if (res.ok) {
+      showToast(`🚨 ${data.message}`);
+      await fetchLiveState();
+    } else {
+      executeLocalEmergencyHandover(order);
+    }
+  } catch (err) {
+    executeLocalEmergencyHandover(order);
+  }
+}
+
+function executeLocalEmergencyHandover(order) {
+  const currentCourierName = order.riderName || "Current Courier";
+  const backupRider = appState.riders.find(r => r.id !== order.riderId && r.available) || appState.riders[2] || appState.riders[0];
+  
+  order.riderId = backupRider.id;
+  order.riderName = backupRider.name;
+  order.riderMobile = backupRider.mobile;
+  order.riderLat = backupRider.lat;
+  order.riderLng = backupRider.lng;
+  order.isDelayed = true;
+  order.delayReason = `Courier ${currentCourierName} stuck in heavy traffic (>10m). Emergency handover to nearest backup courier ${backupRider.name} (1.7 km away).`;
+  order.status = "Emergency Reassigned";
+  order.assignedRiders = [
+    {
+      riderId: backupRider.id,
+      riderName: backupRider.name,
+      mobile: backupRider.mobile,
+      vehicle: backupRider.vehicle,
+      assignedUnits: order.quantity || 35,
+      distanceKm: 1.7,
+      status: "Emergency Dispatched",
+      lat: backupRider.lat,
+      lng: backupRider.lng
+    }
+  ];
+  if (!order.auditLog) order.auditLog = [];
+  order.auditLog.unshift(`🚨 10-Min Traffic Delay Handover: Courier ${currentCourierName} delayed >10m in traffic. Order auto-transferred to nearest backup courier ${backupRider.name} (1.7 km away).`);
+
+  saveOfflineState();
+  renderTrackingSidebar();
+  updateOrderTelemetryDisplay();
+  initOrUpdateMap();
+  showToast(`🚨 Handover complete: Reassigned to nearest backup courier ${backupRider.name}!`);
+}
+
+// =========================================================================
+// 5. Leaflet Interactive GPS Map with Dynamic Geocoding
+// =========================================================================
+function initOrUpdateMap() {
+  const mapElement = document.getElementById("trackingMap");
+  if (!mapElement) return;
+
+  const currentOrder = appState.orders.find(o => o.id === appState.selectedOrderId) || appState.orders[0];
+
+  // Resolve real coordinates dynamically from order or address
+  let donorCoords, receiverCoords;
+
+  if (currentOrder?.donorLat && currentOrder?.donorLng) {
+    donorCoords = [currentOrder.donorLat, currentOrder.donorLng];
+  } else {
+    const pGeo = resolveClientCoords(currentOrder?.pickupAddress || "Pune");
+    donorCoords = [pGeo.lat, pGeo.lng];
+  }
+
+  if (currentOrder?.receiverLat && currentOrder?.receiverLng) {
+    receiverCoords = [currentOrder.receiverLat, currentOrder.receiverLng];
+  } else {
+    const dGeo = resolveClientCoords(`${currentOrder?.deliveryLocation} ${currentOrder?.deliveryAddress}`);
+    receiverCoords = [dGeo.lat, dGeo.lng];
+  }
+
+  if (!leafletMap) {
+    leafletMap = L.map("trackingMap").setView(donorCoords, 13);
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 19,
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(leafletMap);
+  }
+
+  leafletMap.invalidateSize();
+
+  // Clear existing markers & polylines
+  if (pickupMarker) leafletMap.removeLayer(pickupMarker);
+  if (dropMarker) leafletMap.removeLayer(dropMarker);
+  riderMarkers.forEach(m => leafletMap.removeLayer(m));
+  riderMarkers = [];
+  routePolylines.forEach(p => leafletMap.removeLayer(p));
+  routePolylines = [];
+
+  // Custom marker pin icons
+  const pickupIcon = L.divIcon({
+    className: "custom-map-pin",
+    html: `<div style="background:#F68D72;color:white;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 10px rgba(0,0,0,0.25);border:2px solid white;font-size:16px;">🏪</div>`,
+    iconSize: [34, 34],
+    iconAnchor: [17, 17]
+  });
+
+  const dropIcon = L.divIcon({
+    className: "custom-map-pin",
+    html: `<div style="background:#8E7CC3;color:white;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 10px rgba(0,0,0,0.25);border:2px solid white;font-size:16px;">🏠</div>`,
+    iconSize: [34, 34],
+    iconAnchor: [17, 17]
+  });
+
+  pickupMarker = L.marker(donorCoords, { icon: pickupIcon })
+    .addTo(leafletMap)
+    .bindPopup(`<b>🏪 Pickup (Donor):</b><br>${escapeHTML(currentOrder?.pickupAddress || "Donor Pickup")}`);
+
+  dropMarker = L.marker(receiverCoords, { icon: dropIcon })
+    .addTo(leafletMap)
+    .bindPopup(`<b>🏠 Destination (Receiver):</b><br>${escapeHTML(currentOrder?.deliveryAddress || "Receiver Drop")}`);
+
+  const allMapPoints = [donorCoords, receiverCoords];
+
+  // Handle Multi-Rider or Single-Rider Pin Rendering
+  const ridersList = (currentOrder?.assignedRiders && currentOrder.assignedRiders.length > 0)
+    ? currentOrder.assignedRiders
+    : [
+        {
+          riderName: currentOrder?.riderName || "Dispatched Courier",
+          vehicle: "Motorcycle",
+          assignedUnits: currentOrder?.quantity || 10,
+          lat: currentOrder?.riderLat || donorCoords[0] + 0.005,
+          lng: currentOrder?.riderLng || donorCoords[1] + 0.005
+        }
+      ];
+
+  const riderColors = ["#38A169", "#3182CE", "#D69E2E", "#805AD5"];
+
+  ridersList.forEach((r, idx) => {
+    const rCoords = [r.lat || (donorCoords[0] + 0.004 * (idx + 1)), r.lng || (donorCoords[1] + 0.004 * (idx + 1))];
+    allMapPoints.push(rCoords);
+
+    const color = riderColors[idx % riderColors.length];
+    const riderIcon = L.divIcon({
+      className: "custom-map-pin",
+      html: `<div style="background:${color};color:white;width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,0.3);border:2px solid white;font-size:16px;font-weight:bold;">🛵</div>`,
+      iconSize: [38, 38],
+      iconAnchor: [19, 19]
+    });
+
+    const m = L.marker(rCoords, { icon: riderIcon })
+      .addTo(leafletMap)
+      .bindPopup(`<b>🛵 Courier #${idx + 1}: ${escapeHTML(r.riderName)}</b><br>Carrying: ${r.assignedUnits} units (${escapeHTML(r.vehicle)})`);
+    riderMarkers.push(m);
+
+    // Connecting dashed route line
+    const pLine = L.polyline([rCoords, donorCoords, receiverCoords], {
+      color: color,
+      weight: 4,
+      opacity: 0.8,
+      dashArray: "6, 8"
+    }).addTo(leafletMap);
+    routePolylines.push(pLine);
+  });
+
+  // Fit bounds precisely around all points
+  const group = L.featureGroup([pickupMarker, dropMarker, ...riderMarkers]);
+  leafletMap.fitBounds(group.getBounds(), { padding: [50, 50] });
+}
+
+// Live GPS Simulation
+function toggleLiveGPSSimulation() {
+  const btn = document.getElementById("btnLiveSim");
+  if (isSimulatingGPS) {
+    clearInterval(simInterval);
+    isSimulatingGPS = false;
+    btn.innerHTML = "▶ Start Live GPS Movement";
+    btn.classList.remove("btn-primary");
+    btn.classList.add("btn-peach");
+    showToast("GPS Live Simulation Paused.");
+    return;
+  }
+
+  const order = appState.orders.find(o => o.id === appState.selectedOrderId);
+  if (!order) {
+    showToast("Please select an active order to simulate.");
+    return;
+  }
+
+  isSimulatingGPS = true;
+  btn.innerHTML = "❚❚ Pause GPS Simulation";
+  btn.classList.remove("btn-peach");
+  btn.classList.add("btn-primary");
+  showToast("Real-time GPS simulation active! Couriers moving along route.");
+
+  const startLat = order.donorLat || 18.5180;
+  const startLng = order.donorLng || 73.8420;
+  const endLat = order.receiverLat || 18.5308;
+  const endLng = order.receiverLng || 73.8647;
+
+  let step = 0;
+  const totalSteps = 35;
+
+  simInterval = setInterval(() => {
+    step++;
+    const progressFactor = step / totalSteps;
+    const curLat = startLat + (endLat - startLat) * progressFactor;
+    const curLng = startLng + (endLng - startLng) * progressFactor;
+
+    riderMarkers.forEach((m, idx) => {
+      m.setLatLng([curLat + (idx * 0.001), curLng + (idx * 0.001)]);
+    });
+
+    const remainingKm = Math.max(0, (2.8 * (1 - progressFactor))).toFixed(1);
+    const etaMins = Math.max(1, Math.round(7 * (1 - progressFactor)));
+    const speed = (30 + Math.floor(Math.random() * 10));
+
+    document.getElementById("telemDistance").textContent = `${remainingKm} km`;
+    document.getElementById("telemETA").textContent = `${etaMins} mins`;
+    document.getElementById("telemSpeed").textContent = `${speed} km/h`;
+
+    if (step >= totalSteps) {
+      clearInterval(simInterval);
+      isSimulatingGPS = false;
+      btn.innerHTML = "▶ Start Live GPS Movement";
+      advanceOrderStatus(order.id, "Delivered", 100);
+      showToast("🎉 Couriers arrived at destination! Order Delivered.");
+    }
+  }, 600);
+}
+
+async function advanceOrderStatus(orderId, newStatus, newProgress) {
+  try {
+    const res = await fetch(`/api/orders/${orderId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status: newStatus, progress: newProgress })
+    });
+    if (res.ok) {
+      showToast(`Order status updated to: ${newStatus}`);
+      fetchLiveState();
+      return;
+    }
+  } catch (err) {
+    console.warn("Advance order offline fallback:", err);
+  }
+
+  // Offline fallback
+  const o = appState.orders.find(item => item.id === orderId);
+  if (o) {
+    o.status = newStatus;
+    o.progress = newProgress;
+    saveOfflineState();
+    showToast(`Order status updated to: ${newStatus}`);
+    renderTrackingSidebar();
+    updateOrderTelemetryDisplay();
+  }
+}
+
+// =========================================================================
+// 6. Receiver Form Submission with Dynamic Location Detection
+// =========================================================================
+async function handleReceiverSubmit(e) {
+  e.preventDefault();
+  const btn = document.getElementById("btnSubmitRequest");
+  btn.disabled = true;
+  btn.textContent = "Submitting to Network...";
+
+  const loc = document.getElementById("reqLocation").value.trim();
+  const addr = document.getElementById("reqAddress").value.trim();
+  const geo = resolveClientCoords(`${loc} ${addr}`);
+
+  const payload = {
+    receiverName: document.getElementById("reqName").value.trim(),
+    receiverMobile: document.getElementById("reqMobile").value.trim(),
+    reason: document.getElementById("reqReason").value,
+    category: document.getElementById("reqCategory").value,
+    item: document.getElementById("reqItem").value.trim(),
+    quantity: Number(document.getElementById("reqQuantity").value),
+    address: addr,
+    location: loc || "Pune",
+    lat: geo.lat,
+    lng: geo.lng,
+    deliveryTime: document.getElementById("reqDeliveryTime").value.trim(),
+    notes: document.getElementById("reqNotes").value.trim()
+  };
+
+  try {
+    const res = await fetch("/api/requests", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+
+    if (res.ok) {
+      showToast(`✨ Request placed! Coordinates detected at ${geo.name}.`);
+      document.getElementById("reqName").value = "";
+      document.getElementById("reqMobile").value = "";
+      document.getElementById("reqItem").value = "";
+      document.getElementById("reqAddress").value = "";
+      document.getElementById("reqNotes").value = "";
+      await fetchLiveState();
+      navigateTo("donate");
+      return;
+    }
+  } catch (err) {
+    console.warn("Receiver submit offline fallback:", err);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "🚀 Post Request to Network";
+  }
+
+  // Offline fallback execution
+  const newReq = {
+    id: "REQ-" + String(Date.now()).slice(-6),
+    ...payload,
+    status: "Pending",
+    createdAt: Date.now()
+  };
+  appState.requests.unshift(newReq);
+  saveOfflineState();
+  showToast(`✨ Request placed! Coordinates detected at ${geo.name}.`);
+  document.getElementById("reqName").value = "";
+  document.getElementById("reqMobile").value = "";
+  document.getElementById("reqItem").value = "";
+  document.getElementById("reqAddress").value = "";
+  document.getElementById("reqNotes").value = "";
+  renderDonorFeed();
+  renderStats();
+  navigateTo("donate");
+}
+
+// =========================================================================
+// 7. Donor Pledge Modal & Multi-Rider / Proximity Dispatch
+// =========================================================================
+function openPledgeModal(requestId) {
+  appState.selectedRequestId = requestId;
+  const req = appState.requests.find(r => r.id === requestId);
+  if (!req) return;
+
+  const isLargeBatch = req.quantity > 20;
+
+  document.getElementById("pledgeSummaryText").innerHTML = `
+    You are pledging to fulfill <b>${escapeHTML(req.quantity)} units</b> of 
+    <b>${escapeHTML(req.item)}</b> for <b>${escapeHTML(req.receiverName)}</b> 
+    (📍 ${escapeHTML(req.location || req.address)}).
+    ${isLargeBatch ? '<div style="margin-top:6px; font-weight:700; color:var(--peach-dark);">⚡ Large Volume: System will automatically calculate proximity and split the delivery across the nearest couriers!</div>' : ''}
+  `;
+
+  openModal("donorPledgeModal");
+}
+
+async function handleDonationConfirm(e) {
+  e.preventDefault();
+  const pickupAddr = document.getElementById("donorPickupInput").value.trim();
+  const pGeo = resolveClientCoords(pickupAddr);
+
+  const payload = {
+    requestId: appState.selectedRequestId,
+    donorName: document.getElementById("donorNameInput").value.trim(),
+    donorPhone: document.getElementById("donorPhoneInput").value.trim(),
+    pickupAddress: pickupAddr,
+    expiry: Number(document.getElementById("donorExpirySelect").value),
+    pickupNotes: document.getElementById("donorNotesInput").value.trim(),
+    donorLat: pGeo.lat,
+    donorLng: pGeo.lng
+  };
+
+  try {
+    const res = await fetch("/api/donate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      closeModal("donorPledgeModal");
+      if (data.split_count > 1) {
+        showToast(`⚡ High quantity! Delivery split across ${data.split_count} nearest couriers!`);
+      } else {
+        showToast("Donation pledged! Nearest courier auto-assigned.");
+      }
+      await fetchLiveState();
+      navigateTo("tracking");
+      return;
+    }
+  } catch (err) {
+    console.warn("Donation confirm offline fallback:", err);
+  }
+
+  // Offline fallback execution
+  const targetReq = appState.requests.find(r => r.id === appState.selectedRequestId);
+  if (!targetReq) return;
+  targetReq.status = "Donated";
+  targetReq.donorName = payload.donorName;
+
+  const r1 = appState.riders[0];
+  const r2 = appState.riders[1];
+  const isMulti = targetReq.quantity > 20;
+
+  const assigned = isMulti ? [
+    { riderId: r1.id, riderName: r1.name, mobile: r1.mobile, vehicle: r1.vehicle, assignedUnits: Math.ceil(targetReq.quantity / 2), distanceKm: 1.4, lat: 18.524, lng: 73.851, status: "Assigned" },
+    { riderId: r2.id, riderName: r2.name, mobile: r2.mobile, vehicle: r2.vehicle, assignedUnits: Math.floor(targetReq.quantity / 2), distanceKm: 2.1, lat: 18.526, lng: 73.849, status: "Assigned" }
+  ] : [
+    { riderId: r1.id, riderName: r1.name, mobile: r1.mobile, vehicle: r1.vehicle, assignedUnits: targetReq.quantity, distanceKm: 1.4, lat: 18.524, lng: 73.851, status: "Assigned" }
+  ];
+
+  const newOrder = {
+    id: "EL-" + String(Date.now()).slice(-6),
+    requestId: targetReq.id,
+    item: targetReq.item,
+    category: targetReq.category,
+    quantity: targetReq.quantity,
+    receiverName: targetReq.receiverName,
+    receiverMobile: targetReq.receiverMobile,
+    deliveryAddress: targetReq.address,
+    deliveryLocation: targetReq.location || "Pune",
+    receiverLat: targetReq.lat || 18.5308,
+    receiverLng: targetReq.lng || 73.8647,
+    donorName: payload.donorName,
+    donorPhone: payload.donorPhone,
+    pickupAddress: payload.pickupAddress,
+    donorLat: pGeo.lat,
+    donorLng: pGeo.lng,
+    pickupNotes: payload.pickupNotes,
+    expiry: payload.expiry,
+    expiresAt: Date.now() + payload.expiry * 60000,
+    assignedAt: Date.now(),
+    riderId: r1.id,
+    riderName: isMulti ? `${r1.name} & ${r2.name} (Split: 2 Couriers)` : r1.name,
+    riderMobile: r1.mobile,
+    riderLat: r1.lat,
+    riderLng: r1.lng,
+    assignedRiders: assigned,
+    status: "Rider Assigned",
+    progress: 25,
+    isDelayed: false,
+    delayReason: "",
+    createdAt: Date.now(),
+    auditLog: [isMulti ? `⚡ Order (${targetReq.quantity} units) split across 2 nearest couriers: ${r1.name} & ${r2.name}` : `Nearest courier ${r1.name} (1.4 km) assigned.`]
+  };
+
+  appState.orders.unshift(newOrder);
+  appState.selectedOrderId = newOrder.id;
+  saveOfflineState();
+  closeModal("donorPledgeModal");
+  showToast(isMulti ? "⚡ High quantity! Delivery split across 2 nearest couriers!" : "Donation pledged! Nearest courier auto-assigned.");
+  renderTrackingSidebar();
+  renderStats();
+  navigateTo("tracking");
+}
+
+// =========================================================================
+// 8. Rider Volunteer Registration
+// =========================================================================
+async function handleRiderRegister(e) {
+  e.preventDefault();
+  const loc = document.getElementById("riderHub").value.trim() || "Pune Station / AISSMS Hub";
+  const geo = resolveClientCoords(loc);
+
+  const payload = {
+    name: document.getElementById("riderFullName").value.trim(),
+    mobile: document.getElementById("riderPhone").value.trim(),
+    vehicle: document.getElementById("riderVehicle").value,
+    capacity: Number(document.getElementById("riderCapacity").value),
+    location: loc,
+    lat: geo.lat,
+    lng: geo.lng
+  };
+
+  try {
+    const res = await fetch("/api/riders", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+
+    if (res.ok) {
+      showToast(`Rider registered! Placed at hub: ${geo.name}.`);
+      toggleRiderRegisterPanel();
+      fetchLiveState();
+    }
+  } catch (err) {
+    showToast("Error registering delivery partner.");
+  }
+}
+
+// =========================================================================
+// 9. Admin Portal
+// =========================================================================
+function handleAdminLogin(e) {
+  e.preventDefault();
+  const pwd = document.getElementById("adminPwdInput").value;
+  if (pwd === "admin123") {
+    appState.isAdminLoggedIn = true;
+    document.getElementById("adminLoginSection").style.display = "none";
+    document.getElementById("adminPanelSection").style.display = "block";
+    renderAdminRequests();
+    showToast("Admin session unlocked.");
+  } else {
+    showToast("Invalid admin password. Default is admin123");
+  }
+}
+
+function handleAdminLogout() {
+  appState.isAdminLoggedIn = false;
+  document.getElementById("adminLoginSection").style.display = "block";
+  document.getElementById("adminPanelSection").style.display = "none";
+  document.getElementById("adminPwdInput").value = "";
+}
+
+function renderAdminRequests() {
+  const container = document.getElementById("adminRequestsList");
+  if (!container || !appState.isAdminLoggedIn) return;
+
+  container.innerHTML = appState.requests.map(r => `
+    <div class="card-panel" style="padding: 18px;">
+      <div class="card-top">
+        <div>
+          <h4>${escapeHTML(r.item)} (${escapeHTML(r.quantity)} units)</h4>
+          <div class="card-meta">${escapeHTML(r.id)} • Receiver: ${escapeHTML(r.receiverName)} (${escapeHTML(r.receiverMobile)})</div>
+        </div>
+        <span class="badge ${r.status.includes('Approved') ? 'badge-green' : 'badge-peach'}">
+          ${escapeHTML(r.status)}
+        </span>
+      </div>
+
+      <div style="font-size: 13px; color: var(--text-muted); margin: 8px 0;">
+        Reason: ${escapeHTML(r.reason)} | 📍 Area: ${escapeHTML(r.address)} (${r.lat?.toFixed(4)}, ${r.lng?.toFixed(4)})
+      </div>
+
+      ${r.status === "Pending" ? `
+        <div style="display: flex; gap: 8px; margin-top: 10px;">
+          <button class="btn btn-primary btn-sm" onclick="adminApproveReq('${r.id}')">
+            ✓ Approve & Prioritize
+          </button>
+          <button class="btn btn-white btn-sm" onclick="adminRejectReq('${r.id}')">
+            ✕ Reject / Remove
+          </button>
+        </div>
+      ` : ""}
+    </div>
+  `).join("");
+}
+
+async function adminApproveReq(reqId) {
+  try {
+    await fetch(`/api/admin/approve/${reqId}`, { method: "POST" });
+    showToast(`Request ${reqId} approved and prioritized.`);
+    fetchLiveState();
+  } catch (err) {}
+}
+
+async function adminRejectReq(reqId) {
+  try {
+    await fetch(`/api/admin/reject/${reqId}`, { method: "POST" });
+    showToast(`Request ${reqId} rejected.`);
+    fetchLiveState();
+  } catch (err) {}
+}
+
+// =========================================================================
+// 10. Interactive Demo Video Player (Top-Left Corner)
+// =========================================================================
+function openDemoModal() {
+  openModal("demoVideoModal");
+  demoStageIndex = 0;
+  updateDemoStageUI();
+  startDemoAutoPlay();
+}
+
+function updateDemoStageUI() {
+  const stage = demoStages[demoStageIndex];
+  document.getElementById("demoIcon").textContent = stage.icon;
+  document.getElementById("demoStageTitle").textContent = stage.title;
+  document.getElementById("demoStageDesc").textContent = stage.desc;
+}
+
+function nextDemoStage() {
+  demoStageIndex = (demoStageIndex + 1) % demoStages.length;
+  updateDemoStageUI();
+}
+
+function prevDemoStage() {
+  demoStageIndex = (demoStageIndex - 1 + demoStages.length) % demoStages.length;
+  updateDemoStageUI();
+}
+
+function toggleDemoPlayback() {
+  const btn = document.getElementById("btnPlayPauseDemo");
+  if (isDemoPlaying) {
+    clearInterval(demoPlayInterval);
+    isDemoPlaying = false;
+    btn.textContent = "▶ Play";
+  } else {
+    startDemoAutoPlay();
+    isDemoPlaying = true;
+    btn.textContent = "❚❚ Pause";
+  }
+}
+
+function startDemoAutoPlay() {
+  clearInterval(demoPlayInterval);
+  demoPlayInterval = setInterval(() => {
+    nextDemoStage();
+  }, 4500);
+}
+
+// =========================================================================
+// 11. Mobile Connect Modal & Utilities
+// =========================================================================
+function openMobileConnectModal() {
+  openModal("mobileConnectModal");
+  fetchServerInfo();
+}
+
+function copyMobileUrl() {
+  const url = appState.serverInfo.mobile_url || window.location.origin;
+  navigator.clipboard.writeText(url).then(() => {
+    showToast("📋 Mobile connection URL copied to clipboard!");
+  }).catch(() => {
+    showToast(`Copy URL: ${url}`);
+  });
+}
+
+function openModal(id) {
+  const m = document.getElementById(id);
+  if (m) m.classList.add("open");
+}
+
+function closeModal(id) {
+  const m = document.getElementById(id);
+  if (m) m.classList.remove("open");
+  if (id === "demoVideoModal") {
+    clearInterval(demoPlayInterval);
+  }
+}
+
+function handleModalOverlayClick(e, id) {
+  if (e.target === e.currentTarget) {
+    closeModal(id);
+  }
+}
+
+window.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") {
+    document.querySelectorAll(".modal-overlay").forEach(m => m.classList.remove("open"));
+    clearInterval(demoPlayInterval);
+  }
+});
+
+function showToast(message) {
+  const t = document.getElementById("toastNotification");
+  const msgEl = document.getElementById("toastMessage");
+  if (!t || !msgEl) return;
+
+  msgEl.textContent = message;
+  t.classList.add("show");
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => {
+    t.classList.remove("show");
+  }, 3500);
+}
+
+// Initial Boot
+window.addEventListener("DOMContentLoaded", () => {
+  const initialHash = window.location.hash.replace("#", "") || "home";
+  navigateTo(initialHash);
+  fetchLiveState();
+  fetchServerInfo();
+});
